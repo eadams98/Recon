@@ -13,8 +13,8 @@ INSERT INTO School(school_name) VALUES ("Aztec");
 
 -- Contractors
 
-INSERT INTO Contractor(first_name, last_name, email_id) VALUES("Bob", "The Builder", "contractor.1@yahoo.com");
-INSERT INTO Contractor(first_name, last_name, email_id) VALUES("Handy", "Mandy", "contractor.2@yahoo.com");
+INSERT INTO Contractor(first_name, last_name, email_id, password, role_id) VALUES("Bob", "The Builder", "contractor.1@yahoo.com", "$2a$10$rCbQgncvYiv/GztuN.GmbuDsG6IeptbC8Bs/nzIqTNxF1G2FtlrpW", 4); #Password: password
+INSERT INTO Contractor(first_name, last_name, email_id, password, role_id) VALUES("Handy", "Mandy", "contractor.2@yahoo.com", "$2a$10$rCbQgncvYiv/GztuN.GmbuDsG6IeptbC8Bs/nzIqTNxF1G2FtlrpW", 4); #Password: password
 
 -- Council members
 

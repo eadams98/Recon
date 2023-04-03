@@ -33,6 +33,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Autowired
 	@Qualifier("jwtTraineeDetailsService")
 	private UserDetailsService jwtTraineeDetailsService;
+	@Autowired
+	@Qualifier("jwtContractorDetailsService")
+	private UserDetailsService jwtContractorDetailsService;
+
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -82,8 +86,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		//Once we get the token validate it.
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-			UserDetails userDetails = this.jwtTraineeDetailsService.loadUserByUsername(username);
+			
+			logger.info(request.getRequestURI());
+			UserDetails userDetails;
+			if (request.getRequestURI().startsWith("/trainee")) {
+				try {
+					logger.info("JwtRequestFilter: use TraineeDetailsService"); 
+		            userDetails = jwtTraineeDetailsService.loadUserByUsername(username);
+				} catch( Exception ex) {
+					handlerExceptionResolver.resolveException(request, response, null, ex);
+					return;
+	        	}
+	        } else {
+	        	try {
+		        	logger.info("JwtRequestFilter: use ContractorDetailsService");  
+		            userDetails = jwtContractorDetailsService.loadUserByUsername(username);
+	        	} catch (Exception ex) {
+					handlerExceptionResolver.resolveException(request, response, null, ex);
+					return;
+	        	}
+	        }
 
 			// if token is valid configure Spring Security to manually set authentication
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {

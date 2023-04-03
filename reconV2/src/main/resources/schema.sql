@@ -3,6 +3,8 @@ DROP TABLE IF EXISTS Contractor_to_User;
 DROP TABLE IF EXISTS User_login;
 DROP TABLE IF EXISTS Trainee_login;
 DROP TABLE IF EXISTS Contractor_to_Trainee;
+DROP TABLE IF EXISTS Traineerefreshtoken;
+DROP TABLE IF EXISTS Contractor_refresh_token;
 --
 DROP TABLE IF EXISTS Trainee;
 DROP TABLE IF EXISTS Contractor;
@@ -19,7 +21,11 @@ CREATE TABLE Contractor (
 	first_name VARCHAR(20),
 	last_name VARCHAR(20),
     email_id VARCHAR(50) UNIQUE,
-	PRIMARY KEY (id)
+    role_id INTEGER,
+    password VARCHAR(100) NOT NULL,
+    first_login BOOLEAN DEFAULT 1,
+	PRIMARY KEY (id),
+    FOREIGN KEY (role_id) REFERENCES Role(role_id)
 );
 
 CREATE TABLE Trainee (
@@ -90,12 +96,20 @@ CREATE TABLE Trainee_login (
 	
 );
 
-CREATE TABLE Refreshtoken (
+CREATE TABLE Traineerefreshtoken (
 	id INTEGER AUTO_INCREMENT,
     trainee_id INTEGER,
     token VARCHAR(50) UNIQUE NOT NULL,
     expiry_date DATE,
+    PRIMARY KEY (id),
     FOREIGN KEY(trainee_id) REFERENCES Trainee(trainee_id)
 );
 
-
+CREATE TABLE Contractor_refresh_token (
+	id INTEGER AUTO_INCREMENT,
+    contractor_id INTEGER,
+    token VARCHAR(50) UNIQUE NOT NULL,
+    expiry_date DATE,
+    PRIMARY KEY (id),
+    FOREIGN KEY(contractor_id) REFERENCES Contractor(id)
+);

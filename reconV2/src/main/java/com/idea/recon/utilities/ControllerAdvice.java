@@ -7,6 +7,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.JwtTokenValidationException;
 import com.idea.recon.exceptions.TokenRefreshException;
 
@@ -25,6 +28,9 @@ import io.jsonwebtoken.SignatureException;
 public class ControllerAdvice {
 	
 	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	Environment env;
 
 
 	/*
@@ -87,6 +93,16 @@ public class ControllerAdvice {
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }*/
+	
+	@ExceptionHandler(ContractorException.class)
+    public ResponseEntity<ErrorInfo> handleJwtTokenValidationException(ContractorException ex) {
+		logger.info("ADVICE CONTROLLER: ContractorException");
+		ErrorInfo error = new ErrorInfo();
+		error.setErrorMessage(env.getProperty(ex.getMessage()));
+		error.setErrorCode(HttpStatus.UNAUTHORIZED.value());
+		error.setTimestamp(LocalDateTime.now());
+		return new ResponseEntity<ErrorInfo>(error, HttpStatus.UNAUTHORIZED);
+    }
 	
 	@ExceptionHandler(JwtTokenValidationException.class)
     public ResponseEntity<ErrorInfo> handleJwtTokenValidationException(JwtTokenValidationException ex) {

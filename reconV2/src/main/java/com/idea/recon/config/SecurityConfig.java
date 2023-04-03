@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -38,11 +42,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Autowired
-	@Qualifier("jwtTraineeDetailsService")
-	private UserDetailsService jwtUserDetailsService;
+	AuthenticationManagerBuilder builder;
+	
+	@Autowired
+    private ObjectPostProcessor<Object> objectPostProcessor;
 
 	@Autowired
+	@Qualifier("jwtTraineeDetailsService")
+	private UserDetailsService jwtTraineeDetailsService;
+	@Autowired
+	@Qualifier("jwtContractorDetailsService")
+	private UserDetailsService jwtContractorDetailsService;
+	
+	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
+	
+	@Autowired
+	CustomAuthenticationProvider mapperAuthProvider;
 	
 	@Autowired
 	private final HandlerExceptionResolver handlerExceptionResolver;
@@ -57,7 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
 		// Use BCryptPasswordEncoder
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+		//auth.userDetailsService(jwtTraineeDetailsService).passwordEncoder(passwordEncoder());
+		auth
+        .authenticationProvider(mapperAuthProvider);
 	}
 
 	@Bean
@@ -65,23 +83,63 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
+	// Custom Auth Manager Start
+	@Primary
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
+	
+	 private AuthenticationManagerBuilder authenticationManagerBuilder() throws Exception {
+	        return new AuthenticationManagerBuilder(objectPostProcessor);
+	   }
+	
+	@Bean(name = "traineeAuthenticationManager")
+    public AuthenticationManager traineeAuthenticationManager() throws Exception {
+        AuthenticationManagerBuilder builder = authenticationManagerBuilder();
+        builder.userDetailsService(jwtTraineeDetailsService).passwordEncoder(passwordEncoder());
+        return builder.build();
+    }
+	
+	@Bean(name = "contractorAuthenticationManager")
+    public AuthenticationManager contractorAuthenticationManager() throws Exception {
+        AuthenticationManagerBuilder builder = authenticationManagerBuilder();
+        builder.userDetailsService(jwtContractorDetailsService).passwordEncoder(passwordEncoder());
+        return builder.build();
+    }
+	// Custom  Auth Manager End
+	
+	// Custom Auth Provider Start
+	@Bean
+	public AuthenticationProvider traineeAuthenticationProvider() {
+	    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+	    provider.setUserDetailsService(jwtTraineeDetailsService);
+	    provider.setPasswordEncoder(passwordEncoder());
+	    return provider;
+	}
+	
+	@Bean
+	public AuthenticationProvider contractorAuthenticationProvider() {
+	    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+	    provider.setUserDetailsService(jwtContractorDetailsService);
+	    provider.setPasswordEncoder(passwordEncoder());
+	    return provider;
+	}
+	// Custom Auth Provider End
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/authenticate", "/register").permitAll().
+				.authorizeRequests().antMatchers("/authenticate/**", "/register").permitAll()
+				
 				// all other requests need to be authenticated
-						anyRequest().authenticated().and().
+					.anyRequest().authenticated().and()
 				// make sure we use stateless session; session won't be used to
 				// store user's state.
-						exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+						.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		// Add a filter to validate the tokens with every request

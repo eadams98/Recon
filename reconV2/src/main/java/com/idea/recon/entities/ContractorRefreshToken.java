@@ -12,24 +12,21 @@ import javax.persistence.OneToOne;
 
 import lombok.Data;
 
-@Entity(name = "refreshtoken")
+@Entity(name = "contractor_refresh_token")
 @Data
-public class RefreshToken {
+public class ContractorRefreshToken {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@OneToOne
 	//@JoinColumn(name = "trainee_id", referencedColumnName = "trainee_id")
-	@JoinColumn(name = "trainee_id")
-	private Trainee trainee;
+	@JoinColumn(name = "contractor_id")
+	private Contractor contractor;
 
 	@Column(nullable = false, unique = true)
 	private String token;
 
 	@Column(nullable = false)
   	private Instant expiryDate;
-
-  //getters and setters
-
 }

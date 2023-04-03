@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -29,11 +30,17 @@ public class Contractor {
     private String lastName;
     @Column(name = "email_id", unique = true)
     private String email;
+    private String password;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "supervisor")
     @JsonManagedReference
     //@JoinColumn(name = "supervisor_id")
     private List<Trainee> trainees;
+    
+    //Could be a list in future but for now just one
+    @ManyToOne
+    @JoinColumn(name= "role_id")
+    private Role role;
 
    
 }
