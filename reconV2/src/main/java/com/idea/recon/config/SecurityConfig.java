@@ -53,6 +53,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	@Qualifier("jwtContractorDetailsService")
 	private UserDetailsService jwtContractorDetailsService;
+	@Autowired
+	@Qualifier("jwtSchoolDetailsService")
+	private UserDetailsService jwtSchoolDetailsService;
+	
 	
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
@@ -108,6 +112,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         builder.userDetailsService(jwtContractorDetailsService).passwordEncoder(passwordEncoder());
         return builder.build();
     }
+	
+	@Bean(name = "schoolAuthenticationManager")
+    public AuthenticationManager schoolAuthenticationManager() throws Exception {
+        AuthenticationManagerBuilder builder = authenticationManagerBuilder();
+        builder.userDetailsService(jwtSchoolDetailsService).passwordEncoder(passwordEncoder());
+        return builder.build();
+    }
 	// Custom  Auth Manager End
 	
 	// Custom Auth Provider Start
@@ -133,7 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/authenticate/**", "/register").permitAll()
+				.authorizeRequests().antMatchers("/user/authenticate/**", "/register").permitAll()
 				
 				// all other requests need to be authenticated
 					.anyRequest().authenticated().and()

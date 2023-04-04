@@ -36,6 +36,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Autowired
 	@Qualifier("jwtContractorDetailsService")
 	private UserDetailsService jwtContractorDetailsService;
+	@Autowired
+	@Qualifier("jwtSchoolDetailsService")
+	private UserDetailsService jwtSchoolDetailsService;
 
 
 	@Autowired
@@ -94,6 +97,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 					logger.info("JwtRequestFilter: use TraineeDetailsService"); 
 		            userDetails = jwtTraineeDetailsService.loadUserByUsername(username);
 				} catch( Exception ex) {
+					handlerExceptionResolver.resolveException(request, response, null, ex);
+					return;
+	        	}
+	        } else if (request.getRequestURI().startsWith("/school")) { 
+	        	try {
+		        	logger.info("JwtRequestFilter: use SchoolDetailsService");  
+		            userDetails = jwtSchoolDetailsService.loadUserByUsername(username);
+	        	} catch (Exception ex) {
 					handlerExceptionResolver.resolveException(request, response, null, ex);
 					return;
 	        	}

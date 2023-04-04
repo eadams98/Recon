@@ -23,7 +23,7 @@ import com.idea.recon.repositories.TraineeLoginRepository;
 public class JwtTraineeDetailsService implements UserDetailsService {
 	
 	@Autowired
-	 TraineeLoginRepository traineeLoginRepository;
+	TraineeLoginRepository traineeLoginRepository;
 
 	//@Autowired
 	//private PasswordEncoder bcryptEncoder;

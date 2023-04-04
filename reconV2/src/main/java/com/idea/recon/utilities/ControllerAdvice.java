@@ -18,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.JwtTokenValidationException;
+import com.idea.recon.exceptions.SchoolException;
 import com.idea.recon.exceptions.TokenRefreshException;
 import com.idea.recon.exceptions.TraineeException;
 
@@ -94,6 +95,16 @@ public class ControllerAdvice {
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }*/
+	
+	@ExceptionHandler(SchoolException.class)
+    public ResponseEntity<ErrorInfo> handleTraineeException(SchoolException ex) {
+		logger.info("ADVICE CONTROLLER: SchoolException");
+		ErrorInfo error = new ErrorInfo();
+		error.setErrorMessage(env.getProperty(ex.getMessage()));
+		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		error.setTimestamp(LocalDateTime.now());
+		return new ResponseEntity<ErrorInfo>(error, HttpStatus.BAD_REQUEST);
+    }
 	
 	@ExceptionHandler(TraineeException.class)
     public ResponseEntity<ErrorInfo> handleTraineeException(TraineeException ex) {

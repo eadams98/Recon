@@ -1,5 +1,7 @@
 package com.idea.recon.entities;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -41,5 +44,8 @@ public class Trainee {
     @ManyToOne
     @JoinColumn(name= "role_id")
     private Role role; 
+    
+    @OneToMany(mappedBy="trainee")
+    private List<SchoolToTrainee> school; // ONLY GOING TO BE ONE SCHOOL. HAVE TO RESTRICT WITH SQL AS WELL AS IMPL
    
 }

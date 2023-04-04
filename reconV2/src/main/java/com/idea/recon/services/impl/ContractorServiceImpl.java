@@ -24,6 +24,7 @@ import com.idea.recon.repositories.ContractorRepository;
 import com.idea.recon.services.ContractorService;
 
 @Service
+@Transactional
 public class ContractorServiceImpl implements ContractorService {
 	
 	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -135,6 +136,7 @@ public class ContractorServiceImpl implements ContractorService {
 			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
 		// Could be abstracted out to AOP END
 		
+		// CAN USE DTO ANNOTATIONS VALIDATION AND ADD REQUIRED ANNOTATIONS TO CONTROLLER
 		if(updateInfo.getFirstName() != null && !updateInfo.getFirstName().isBlank() && !updateInfo.getFirstName().equals(foundContractor.getFirstName()))
 			foundContractor.setFirstName(updateInfo.getFirstName());
 		if(updateInfo.getLastName() != null && !updateInfo.getLastName().isBlank() && !updateInfo.getLastName().equals(foundContractor.getLastName()))

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.idea.recon.config.JwtContractorDetailsService;
+import com.idea.recon.config.JwtSchoolDetailsService;
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.config.JwtTraineeDetailsService;
 import com.idea.recon.dtos.JwtRequest;
@@ -24,8 +25,11 @@ import com.idea.recon.dtos.JwtResponse;
 import com.idea.recon.entities.TraineeRefreshToken;
 import com.idea.recon.entities.Contractor;
 import com.idea.recon.entities.ContractorRefreshToken;
+import com.idea.recon.entities.School;
+import com.idea.recon.entities.SchoolRefreshToken;
 import com.idea.recon.entities.TraineeLogin;
 import com.idea.recon.services.ContractorRefreshTokenService;
+import com.idea.recon.services.SchoolRefreshTokenService;
 import com.idea.recon.services.TraineeRefreshTokenService;
 
 @RestController
@@ -41,6 +45,9 @@ public class JwtAuthenticationController {
 	@Qualifier("contractorAuthenticationManager")
 	@Autowired
 	private AuthenticationManager contractorAuthenticationManager;
+	@Qualifier("schoolAuthenticationManager")
+	@Autowired
+	private AuthenticationManager schoolAuthenticationManager;
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -49,11 +56,15 @@ public class JwtAuthenticationController {
 	private JwtTraineeDetailsService traineeDetailsService;
 	@Autowired
 	private JwtContractorDetailsService contractorDetailsService;
+	@Autowired
+	private JwtSchoolDetailsService schoolDetailsService;
 	
 	@Autowired
 	TraineeRefreshTokenService traineeRefreshTokenService;
 	@Autowired
 	ContractorRefreshTokenService contractorRefreshTokenService;
+	@Autowired
+	SchoolRefreshTokenService schoolRefreshTokenService;
 
 	@RequestMapping(value = "/authenticate/{userType}", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@PathVariable String userType, @RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -101,6 +112,27 @@ public class JwtAuthenticationController {
 								userDetails.getAuthorities()
 						)
 				);
+				
+			case "school":
+				userDetails = schoolDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+				final School SchoolDetails = schoolDetailsService.loadSchoolByEmail(authenticationRequest.getUsername());
+				
+				final SchoolRefreshToken schoolRefreshToken = schoolRefreshTokenService.createRefreshToken(userDetails.getUsername());
+				jwtToken = jwtTokenUtil.generateToken(userDetails);
+				
+				logger.info(userDetails.getAuthorities().toString());
+				
+				return ResponseEntity.ok(
+						new JwtResponse(
+								jwtToken, 
+								schoolRefreshToken.getToken(), 
+								SchoolDetails.getSchoolId(),
+								SchoolDetails.getSchoolName(),
+								SchoolDetails.getEmail(), 
+								userDetails.getAuthorities()
+						)
+				);
+				
 			default:
 				throw new Exception("DEFAULT CASE HIT");
 		}
@@ -128,6 +160,18 @@ public class JwtAuthenticationController {
 						logger.warn(ex.getClass().getName());
 						throw ex;
 					}
+					break;
+				case "school":
+					try {
+						schoolAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+						} catch (BadCredentialsException ex) {
+							// Happens if try to login as trainee in body details, but have contractor as userType
+							throw new Exception("Invalid credentials. You may have selected the wrong userType. This is for userType contractor");
+						} catch (Exception ex) {
+							logger.warn(ex.getMessage());
+							logger.warn(ex.getClass().getName());
+							throw ex;
+						}
 					break;
 				default:
 					throw new Exception("INCORRECT USERTYPE GIVEN. You gave " + userType +  " but the accepted types are (trainee, contractor, school, council)");

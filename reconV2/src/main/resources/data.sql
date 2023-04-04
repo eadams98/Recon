@@ -9,7 +9,7 @@ INSERT INTO Role(name) VALUES ("trainee");
 
 -- Schools
 
-INSERT INTO School(school_name) VALUES ("Aztec");
+INSERT INTO School(email_id, school_name, role_id, password) VALUES ("school.1@yahoo.com", "Aztec", 3, "$2a$10$rCbQgncvYiv/GztuN.GmbuDsG6IeptbC8Bs/nzIqTNxF1G2FtlrpW");
 
 -- Contractors
 
@@ -32,6 +32,11 @@ INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) VAL
 
 INSERT Trainee_login(user_id, password, recovery_question, recovery_answer) VALUES(1, "$2a$10$rCbQgncvYiv/GztuN.GmbuDsG6IeptbC8Bs/nzIqTNxF1G2FtlrpW", "Birth Month?", "May"); -- //password
 INSERT Trainee_login(user_id, password, recovery_question, recovery_answer) VALUES(2, "$2a$10$FtZ0Y/xpHbWuQwlgEEo5ue6mmEnhLtLdggPoRRoEAPmQdFAJ3Pj1i", "Birth Month?", "May"); -- May@123
+
+-- School to Trainee
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 1, "1998-05-15");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 3, "2009-12-01");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 2, "2012-08-08");
 
 -- Role
 

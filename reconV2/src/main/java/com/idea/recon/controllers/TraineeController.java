@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,7 +20,7 @@ import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.services.TraineeService;
 
-
+@CrossOrigin
 @Controller
 @RequestMapping("/trainee")
 public class TraineeController {
