@@ -30,6 +30,7 @@ import com.idea.recon.services.TraineeRefreshTokenService;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/user")
 public class JwtAuthenticationController {
 	
 	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());

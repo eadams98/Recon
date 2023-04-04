@@ -12,7 +12,7 @@ import com.idea.recon.entities.TraineeRefreshToken;
 import com.idea.recon.repositories.ContractorRepository;
 import com.idea.recon.repositories.TraineeRefreshTokenRepository;
 import com.idea.recon.repositories.TraineeLoginRepository;
-import com.idea.recon.repositories.UserRepositories;
+import com.idea.recon.repositories.TraineeRepository;
 import com.idea.recon.services.TraineeRefreshTokenService;
 
 @Service
@@ -25,7 +25,7 @@ public class TraineeRefreshTokenServiceImpl implements TraineeRefreshTokenServic
 	private TraineeRefreshTokenRepository refreshTokenRepository;
 	
 	@Autowired
-	private UserRepositories traineeRepository; // traineeRepository
+	private TraineeRepository traineeRepository; // traineeRepository
 
 	@Override
 	public Optional<TraineeRefreshToken> findByToken(String token) {
@@ -35,7 +35,7 @@ public class TraineeRefreshTokenServiceImpl implements TraineeRefreshTokenServic
 	@Override
 	public TraineeRefreshToken createRefreshToken(String emailId) {
 		TraineeRefreshToken refreshToken = new TraineeRefreshToken();
-		refreshToken.setTrainee(traineeRepository.getByEmailId(emailId).get()); // set User
+		refreshToken.setTrainee(traineeRepository.getByEmail(emailId).get()); // set User
 	    
 	    refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
 	    refreshToken.setToken(UUID.randomUUID().toString());

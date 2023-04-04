@@ -3,6 +3,9 @@ package com.idea.recon.services.impl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ public class ContractorServiceImpl implements ContractorService {
 	@Override
 	public Set<TraineeDTO> getContractorsTrainees(Integer id, String token) throws ContractorException {
 		
+		// Could be abstracted out to AOP START
 		UserDetails user = jwtContractorDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
 		logger.info("user authorities: " + user.getAuthorities());
 		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
@@ -49,6 +53,7 @@ public class ContractorServiceImpl implements ContractorService {
 		
 		if (!isAdmin && !isSameContractor)
 			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END
 		
 		Set<TraineeDTO> contractorTrainees = new HashSet<>();
 		ContractorDTO foundContractorDTO = ContractorDTO.builder()
@@ -71,6 +76,78 @@ public class ContractorServiceImpl implements ContractorService {
 		});
 		
 		return contractorTrainees;
+	}
+
+	@Override
+	public ContractorDTO getMyDetails(Integer id, String token) throws ContractorException {
+		
+		/*
+		 * Not a great idea to stream over trainee list and send since it could be large. 
+		 * Solutions: 
+		 * 1) Make a seperate API for getting trainees with Pagination and sorting
+		 * 2) 
+		 */
+		
+		// Could be abstracted out to AOP START
+		UserDetails user = jwtContractorDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		logger.info("user authorities: " + user.getAuthorities());
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		logger.info("user authorities contains 'admin': " + isAdmin);
+		
+		Contractor foundContractor = contractoryRepository.findById(id).get();
+		boolean isSameContractor = contractoryRepository.getByEmail(user.getUsername()).get() == foundContractor;
+		logger.info("requestor id and contractor id match': " + isSameContractor);
+		
+		if (!isAdmin && !isSameContractor)
+			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END
+		
+		ContractorDTO contractorDetails = ContractorDTO.builder()
+				.email(foundContractor.getEmail())
+				.firstName(foundContractor.getFirstName())
+				.lastName(foundContractor.getLastName())
+				.trainees(
+						foundContractor.getTrainees().stream()
+						.map(trainee -> new TraineeDTO(trainee.getTraineeId(), trainee.getEmail(), trainee.getFirstName(), trainee.getLastName(), null))
+						.collect(Collectors.toList())
+				)
+				.build();
+		
+		
+		return contractorDetails;
+	}
+
+	@Override
+	@Transactional
+	public String updateMyDetails(ContractorDTO updateInfo, String token) throws ContractorException {
+		
+		// Could be abstracted out to AOP START
+		UserDetails user = jwtContractorDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		logger.info("user authorities: " + user.getAuthorities());
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		logger.info("user authorities contains 'admin': " + isAdmin);
+		
+		Contractor foundContractor = contractoryRepository.findById(updateInfo.getId()).get(); // I think this is bad practice. Should I just get using emailId from DTO
+		boolean isSameContractor = contractoryRepository.getByEmail(user.getUsername()).get() == foundContractor;
+		logger.info("requestor id and contractor id match': " + isSameContractor);
+		
+		if (!isAdmin && !isSameContractor)
+			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END
+		
+		if(updateInfo.getFirstName() != null && !updateInfo.getFirstName().isBlank() && !updateInfo.getFirstName().equals(foundContractor.getFirstName()))
+			foundContractor.setFirstName(updateInfo.getFirstName());
+		if(updateInfo.getLastName() != null && !updateInfo.getLastName().isBlank() && !updateInfo.getLastName().equals(foundContractor.getLastName()))
+			foundContractor.setLastName(updateInfo.getLastName());
+		if(updateInfo.getEmail() != null && !updateInfo.getEmail().isBlank() && !updateInfo.getEmail().equals(foundContractor.getEmail()))
+			foundContractor.setEmail(updateInfo.getEmail());
+		
+		
+		String fullName = foundContractor.getFirstName().strip();
+		if (!foundContractor.getLastName().isBlank())
+			fullName += " " + foundContractor.getLastName().strip();
+		
+		return "Contractor: " + fullName + " with Email: " + foundContractor.getEmail() + " has been updated successfully";
 	}
 
 }

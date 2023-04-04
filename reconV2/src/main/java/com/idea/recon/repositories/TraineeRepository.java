@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import com.idea.recon.entities.Trainee;
 import com.idea.recon.entities.TraineeLogin;
 
-public interface UserRepositories extends JpaRepository<Trainee, Integer> {
+public interface TraineeRepository extends JpaRepository<Trainee, Integer> {
 	
 	@Query(
     	value = "Select * from Trainee t WHERE t.email_id = ?1",
     	nativeQuery = true
     )
-    Optional<Trainee> getByEmailId(String email_id);
+    Optional<Trainee> getByEmail(String email_id);
 	
 }

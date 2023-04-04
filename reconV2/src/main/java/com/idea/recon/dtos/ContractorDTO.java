@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion;
 import com.idea.recon.entities.Trainee;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -19,6 +21,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class ContractorDTO {
 	private Integer id;

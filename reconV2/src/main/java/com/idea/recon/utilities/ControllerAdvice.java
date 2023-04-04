@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.JwtTokenValidationException;
 import com.idea.recon.exceptions.TokenRefreshException;
+import com.idea.recon.exceptions.TraineeException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -94,14 +95,24 @@ public class ControllerAdvice {
         }
     }*/
 	
+	@ExceptionHandler(TraineeException.class)
+    public ResponseEntity<ErrorInfo> handleTraineeException(TraineeException ex) {
+		logger.info("ADVICE CONTROLLER: TraineeException");
+		ErrorInfo error = new ErrorInfo();
+		error.setErrorMessage(env.getProperty(ex.getMessage()));
+		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
+		error.setTimestamp(LocalDateTime.now());
+		return new ResponseEntity<ErrorInfo>(error, HttpStatus.BAD_REQUEST);
+    }
+	
 	@ExceptionHandler(ContractorException.class)
-    public ResponseEntity<ErrorInfo> handleJwtTokenValidationException(ContractorException ex) {
+    public ResponseEntity<ErrorInfo> handleContractorException(ContractorException ex) {
 		logger.info("ADVICE CONTROLLER: ContractorException");
 		ErrorInfo error = new ErrorInfo();
 		error.setErrorMessage(env.getProperty(ex.getMessage()));
-		error.setErrorCode(HttpStatus.UNAUTHORIZED.value());
+		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
 		error.setTimestamp(LocalDateTime.now());
-		return new ResponseEntity<ErrorInfo>(error, HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<ErrorInfo>(error, HttpStatus.BAD_REQUEST);
     }
 	
 	@ExceptionHandler(JwtTokenValidationException.class)
