@@ -45,3 +45,5 @@ INSERT Role(name) VALUES("Trainee");
 INSERT Role(name) VALUES("Contractor");
 INSERT Role(name) VALUES("Council");
 INSERT Role(name) VALUES("School");
+
+INSERT INTO Report (title, description, grade, submission_date, week_start_date, week_end_date, contractor_link_id, trainee_link_id) VALUES ("title", "description", "A_PLUS", "1998-05-15", "1998-05-17", "1998-05-20", 2, 2);

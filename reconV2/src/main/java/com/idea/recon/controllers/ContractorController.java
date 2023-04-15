@@ -2,6 +2,8 @@ package com.idea.recon.controllers;
 
 import java.util.Set;
 
+import javax.ws.rs.QueryParam;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +16,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.dtos.ContractorDTO;
+import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Trainee;
+import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.services.ContractorService;
 
 @CrossOrigin
@@ -59,6 +64,22 @@ public class ContractorController {
 	ResponseEntity<String> updateMyDetails(@RequestBody ContractorDTO updateInfo, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(contractorService.updateMyDetails(updateInfo, token), HttpStatus.OK);
+	}
+	
+	// HELPERS
+	@GetMapping(value = "/verify")
+	@PreAuthorize("hasAuthority('contractor')")
+	ResponseEntity<RelationshipVerificationDTO> verifyContractorTraineeRelationship(@RequestParam(value = "by") String byEmail, @RequestParam(value = "for") String forEmail, @RequestHeader (name="Authorization") String token) throws Exception {
+		logger.info("by email: " + byEmail + ", for email: " + forEmail);
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(contractorService.confirmContractorTraineeConnection(byEmail, forEmail, token), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/confirm-access-requst/{id}")
+	@PreAuthorize("hasAuthority('contractor')")
+	ResponseEntity<Boolean> getContractorId(@PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws ContractorException, Exception {
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(contractorService.confirmAccessRequest(id, token), HttpStatus.OK);
 	}
 
 }

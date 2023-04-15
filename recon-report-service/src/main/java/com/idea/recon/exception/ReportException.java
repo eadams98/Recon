@@ -1,4 +1,4 @@
-package com.idea.exception;
+package com.idea.recon.exception;
 
 public class ReportException extends Exception {
 

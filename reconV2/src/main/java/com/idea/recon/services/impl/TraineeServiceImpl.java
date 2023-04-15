@@ -132,4 +132,10 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 
 	}
 
+	@Override
+	public Trainee getTraineeByEmail(String email) throws TraineeException {
+		return traineeRepository.getByEmail(email).orElseThrow(() -> new TraineeException("Trainee.NOT_FOUND"));
+	}
+	
+
 }
