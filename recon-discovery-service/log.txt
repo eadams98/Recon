@@ -1,0 +1,36 @@
+2023-04-16T18:53:20.912Z  INFO 24438 --- [main] .r.ReconDiscoveryServiceApplicationTests : Starting ReconDiscoveryServiceApplicationTests using Java 17.0.6 with PID 24438 (started by root in /root/git/Java/Recon/recon-discovery-service)
+2023-04-16T18:53:20.922Z  INFO 24438 --- [main] .r.ReconDiscoveryServiceApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2023-04-16T18:53:23.638Z  INFO 24438 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=8eb3ef71-f3ea-3be5-8135-a676bca5e70b
+2023-04-16T18:53:27.291Z  INFO 24438 --- [main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2023-04-16T18:53:27.387Z  WARN 24438 --- [main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2023-04-16T18:53:27.813Z  INFO 24438 --- [main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2023-04-16T18:53:27.871Z  INFO 24438 --- [main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2023-04-16T18:53:27.885Z  INFO 24438 --- [main] com.netflix.discovery.DiscoveryClient    : Client configured to neither register nor query for data.
+2023-04-16T18:53:27.921Z  INFO 24438 --- [main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1681671207914 with initial instances count: 0
+2023-04-16T18:53:28.027Z  INFO 24438 --- [main] c.n.eureka.DefaultEurekaServerContext    : Initializing ...
+2023-04-16T18:53:28.038Z  INFO 24438 --- [main] c.n.eureka.cluster.PeerEurekaNodes       : Adding new peer nodes [http://localhost:4001/eureka/]
+2023-04-16T18:53:28.456Z  INFO 24438 --- [main] c.n.d.provider.DiscoveryJerseyProvider   : Using JSON encoding codec LegacyJacksonJson
+2023-04-16T18:53:28.466Z  INFO 24438 --- [main] c.n.d.provider.DiscoveryJerseyProvider   : Using JSON decoding codec LegacyJacksonJson
+2023-04-16T18:53:28.467Z  INFO 24438 --- [main] c.n.d.provider.DiscoveryJerseyProvider   : Using XML encoding codec XStreamXml
+2023-04-16T18:53:28.468Z  INFO 24438 --- [main] c.n.d.provider.DiscoveryJerseyProvider   : Using XML decoding codec XStreamXml
+2023-04-16T18:53:28.781Z  INFO 24438 --- [main] c.n.eureka.cluster.PeerEurekaNodes       : Replica node URL:  http://localhost:4001/eureka/
+2023-04-16T18:53:28.808Z  INFO 24438 --- [main] c.n.e.registry.AbstractInstanceRegistry  : Finished initializing remote region registries. All known remote regions: []
+2023-04-16T18:53:28.811Z  INFO 24438 --- [main] c.n.eureka.DefaultEurekaServerContext    : Initialized
+2023-04-16T18:53:29.259Z  INFO 24438 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2023-04-16T18:53:29.393Z  INFO 24438 --- [main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application UNKNOWN with eureka with status UP
+2023-04-16T18:53:29.441Z  INFO 24438 --- [Thread-9] o.s.c.n.e.server.EurekaServerBootstrap   : isAws returned false
+2023-04-16T18:53:29.443Z  INFO 24438 --- [Thread-9] o.s.c.n.e.server.EurekaServerBootstrap   : Initialized server context
+2023-04-16T18:53:29.444Z  INFO 24438 --- [Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Got 1 instances from neighboring DS node
+2023-04-16T18:53:29.450Z  INFO 24438 --- [Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Renew threshold is: 1
+2023-04-16T18:53:29.458Z  INFO 24438 --- [Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Changing status to UP
+2023-04-16T18:53:29.487Z  INFO 24438 --- [main] .r.ReconDiscoveryServiceApplicationTests : Started ReconDiscoveryServiceApplicationTests in 10.263 seconds (process running for 13.353)
+2023-04-16T18:53:29.496Z  INFO 24438 --- [Thread-9] e.s.EurekaServerInitializerConfiguration : Started Eureka Server
+2023-04-16T18:53:30.590Z  INFO 24438 --- [SpringApplicationShutdownHook] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application UNKNOWN with eureka with status DOWN
+2023-04-16T18:53:30.601Z  INFO 24438 --- [SpringApplicationShutdownHook] o.s.c.n.e.server.EurekaServerBootstrap   : Shutting down Eureka Server..
+2023-04-16T18:53:30.630Z  INFO 24438 --- [SpringApplicationShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shutting down ...
+2023-04-16T18:53:30.691Z  INFO 24438 --- [SpringApplicationShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shut down
+2023-04-16T18:53:30.691Z  INFO 24438 --- [SpringApplicationShutdownHook] o.s.c.n.e.server.EurekaServerBootstrap   : Eureka Service is now shutdown...
+2023-04-16T18:53:30.693Z  INFO 24438 --- [SpringApplicationShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shutting down ...
+2023-04-16T18:53:30.716Z  INFO 24438 --- [SpringApplicationShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shut down
+2023-04-16T18:53:30.737Z  INFO 24438 --- [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2023-04-16T18:53:30.739Z  INFO 24438 --- [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
