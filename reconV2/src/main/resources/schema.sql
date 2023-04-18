@@ -1,3 +1,5 @@
+use recon;
+
 DROP TABLE IF EXISTS Report;
 DROP TABLE IF EXISTS Contractor_to_User;
 DROP TABLE IF EXISTS User_login;
