@@ -68,7 +68,7 @@ public class JwtAuthenticationController {
 	@Autowired
 	SchoolRefreshTokenService schoolRefreshTokenService;
 	
-	@GetMapping(value="/test")
+	@GetMapping(value="/test", produces="application/json")
 	public ResponseEntity<String> helloWorld() {
 		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
 	}
