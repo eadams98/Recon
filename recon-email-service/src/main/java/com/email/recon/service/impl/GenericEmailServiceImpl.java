@@ -138,18 +138,17 @@ public class GenericEmailServiceImpl implements GenericEmailService {
 		try {
 			ListVerifiedEmailAddressesResult result = awsSes.listVerifiedEmailAddresses();
 		    List<String> verifiedEmailAddresses = result.getVerifiedEmailAddresses();
-		    String emailAddress = "eric051598@gmail.com";
 		    
-		    if (verifiedEmailAddresses.contains(emailAddress)) {
-		        System.out.println(emailAddress + " is already verified.");
-		        return "Already verified";
+		    if (verifiedEmailAddresses.contains(email)) {
+		        System.out.println(email + " is already verified.");
+		        return "Already verified: " + email;
 		    }
 		    
 			//System.out.println("INSIDE VERIFY EMAIL");
 			//VerifyEmailIdentityRequest request = new VerifyEmailIdentityRequest().withEmailAddress("eric051598@gmail.com");
 			//VerifyEmailIdentityResult result = awsSes.verifyEmailIdentity(request);
 			//System.out.println(result.toString());
-			return "Email sent to Email address: " ;
+			return "Email sent to Email address: " + email;
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 			return ex.getMessage();
