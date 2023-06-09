@@ -15,7 +15,7 @@ public interface TraineeLoginRepository extends JpaRepository<TraineeLogin, Inte
     Optional<TraineeLogin> getTraineeLoginByUserId(Long user_id);
     
     @Query(
-    	value = "Select * from trainee_Login tl JOIN Trainee t ON tl.user_id = t.trainee_id WHERE t.email_id = ?1",
+    	value = "Select * from trainee_login tl JOIN trainee t ON tl.user_id = t.trainee_id WHERE t.email_id = ?1",
     	nativeQuery = true
     )
     Optional<TraineeLogin> getTraineeLoginByEmailId(String email_id); 

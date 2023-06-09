@@ -1,3 +1,5 @@
+use recon;
+
 DROP TABLE IF EXISTS Report;
 DROP TABLE IF EXISTS Contractor_to_User;
 DROP TABLE IF EXISTS User_login;
@@ -89,11 +91,16 @@ CREATE TABLE Report (
 	report_id INTEGER NOT NULL AUTO_INCREMENT,
 	title VARCHAR(50),
 	description VARCHAR(255),
-	grade ENUM("A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F+", "F", "F-"),
+    rebuttal VARCHAR(255),
+	grade ENUM("A_PLUS", "A", "A_MINUS", "B_PLUS", "B", "B_MINUS", "C_PLUS", "C", "C_MINUS", "D_PLUS", "D", "D_MINUS", "F_PLUS", "F", "F_MINUS"),
 	submission_date Date,
-	link_id INTEGER NOT NULL,
+    week_start_date Date,
+    week_end_date Date,
+	contractor_link_id INTEGER NOT NULL,
+    trainee_link_id INTEGER NOT NULL,
 	PRIMARY KEY (report_id),
-	FOREIGN KEY (link_id) REFERENCES Contractor_to_Trainee(id) 
+	FOREIGN KEY (contractor_link_id) REFERENCES Contractor(id),
+    FOREIGN KEY (trainee_link_id) REFERENCES Trainee(trainee_id)
 );
 
 

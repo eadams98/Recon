@@ -1,5 +1,7 @@
 package com.idea.recon.services.impl;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +21,7 @@ import com.idea.recon.repositories.TraineeRepository;
 import com.idea.recon.services.TraineeService;
 
 @Service
+@Transactional
 public class TraineeServiceImpl implements TraineeService {
 	
 private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -131,5 +134,11 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 		return "Contractor: " + fullName + " with Email: " + foundTrainee.getEmail() + " has been updated successfully";
 
 	}
+
+	@Override
+	public Trainee getTraineeByEmail(String email) throws TraineeException {
+		return traineeRepository.getByEmail(email).orElseThrow(() -> new TraineeException("Trainee.NOT_FOUND"));
+	}
+	
 
 }

@@ -3,6 +3,7 @@ package com.idea.recon.controllers;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +67,11 @@ public class JwtAuthenticationController {
 	ContractorRefreshTokenService contractorRefreshTokenService;
 	@Autowired
 	SchoolRefreshTokenService schoolRefreshTokenService;
+	
+	@GetMapping(value="/test", produces="application/json")
+	public ResponseEntity<String> helloWorld() {
+		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/authenticate/{userType}", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@PathVariable String userType, @RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -83,6 +90,7 @@ public class JwtAuthenticationController {
 		
 				//ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
 				//        userDetails.getUsername(), userDetails.getEmail(), roles));
+				
 				return ResponseEntity.ok(
 						new JwtResponse(
 								jwtToken, 

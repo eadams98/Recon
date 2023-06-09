@@ -17,17 +17,24 @@ import org.springframework.stereotype.Service;
 
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.dtos.ContractorDTO;
+import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Contractor;
+import com.idea.recon.entities.Trainee;
 import com.idea.recon.exceptions.ContractorException;
+import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.repositories.ContractorRepository;
 import com.idea.recon.services.ContractorService;
+import com.idea.recon.services.TraineeService;
 
 @Service
 @Transactional
 public class ContractorServiceImpl implements ContractorService {
 	
 	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired 
+	TraineeService traineeService;
 	
 	@Autowired
 	ContractorRepository contractoryRepository;
@@ -150,6 +157,57 @@ public class ContractorServiceImpl implements ContractorService {
 			fullName += " " + foundContractor.getLastName().strip();
 		
 		return "Contractor: " + fullName + " with Email: " + foundContractor.getEmail() + " has been updated successfully";
+	}
+
+	@Override
+	public RelationshipVerificationDTO confirmContractorTraineeConnection(String contractorEmail, String traineeEmail, String token) throws ContractorException, TraineeException {
+		
+		// Could be abstracted out to AOP START
+		UserDetails user = jwtContractorDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		logger.info("user authorities: " + user.getAuthorities());
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		logger.info("user authorities contains 'admin': " + isAdmin);
+		
+		Contractor foundContractor = contractoryRepository.getByEmail(contractorEmail).get();
+		boolean isSameContractor = contractoryRepository.getByEmail(user.getUsername()).get() == foundContractor;
+		logger.info("requestor id and contractor id match': " + isSameContractor);
+		logger.info(user.getUsername() + " vs ");
+		
+		if (!isAdmin && !isSameContractor)
+			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END
+		
+		
+		Trainee trainee = traineeService.getTraineeByEmail(traineeEmail);
+		if (!foundContractor.getTrainees().contains(trainee))
+			throw new ContractorException("Contractor.TRAINEE_NOT_LINKED");
+		
+		RelationshipVerificationDTO relationship = RelationshipVerificationDTO.builder()
+				.byId(foundContractor.getId())
+				.forId(trainee.getTraineeId())
+				.build();
+		
+		return relationship;
+	}
+
+	@Override
+	public Boolean confirmAccessRequest(Integer id, String token) throws ContractorException, Exception {
+		
+		// Could be abstracted out to AOP START
+		UserDetails user = jwtContractorDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		logger.info("user authorities: " + user.getAuthorities());
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		logger.info("user authorities contains 'admin': " + isAdmin);
+		
+		Contractor foundContractor = contractoryRepository.findById(id).orElseThrow(() -> new ContractorException("Contractor.NOT_FOUND"));
+		boolean isSameContractor = contractoryRepository.getByEmail(user.getUsername()).get() == foundContractor;
+		logger.info("requestor id and contractor id match': " + isSameContractor);
+		
+		if (!isAdmin && !isSameContractor)
+			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END*/
+
+		return true;
 	}
 
 }

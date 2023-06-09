@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -20,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
-@Entity
+@Table(name = "trainee")
+@Entity//(name = "trainee")
 @Data
 public class Trainee {
 	
@@ -29,6 +31,7 @@ public class Trainee {
         strategy = GenerationType.IDENTITY
     )
     private Integer traineeId;
+    @Column(name = "first_name")
     private String firstName;
     private String lastName;
     @Column(name = "email_id", unique = true)

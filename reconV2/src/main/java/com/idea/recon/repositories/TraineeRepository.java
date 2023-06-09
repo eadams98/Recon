@@ -11,7 +11,7 @@ import com.idea.recon.entities.TraineeLogin;
 public interface TraineeRepository extends JpaRepository<Trainee, Integer> {
 	
 	@Query(
-    	value = "Select * from Trainee t WHERE t.email_id = ?1",
+    	value = "Select * from trainee t WHERE t.email_id = ?1",
     	nativeQuery = true
     )
     Optional<Trainee> getByEmail(String email_id);
