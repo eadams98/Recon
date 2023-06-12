@@ -184,7 +184,9 @@ public class ContractorServiceImpl implements ContractorService {
 		
 		RelationshipVerificationDTO relationship = RelationshipVerificationDTO.builder()
 				.byId(foundContractor.getId())
+				.byName(foundContractor.getFirstName() + " " + foundContractor.getLastName())
 				.forId(trainee.getTraineeId())
+				.forName(trainee.getFirstName() + " " + trainee.getLastName())
 				.build();
 		
 		return relationship;

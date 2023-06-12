@@ -257,11 +257,11 @@ public class GenericEmailServiceImpl implements GenericEmailService {
 			return ex.getMessage();
 		}
 		
-		String contractorMessageSubject = emailInfo.getTraineeName() + " Weekly Report: " + emailInfo.getWeekRange();
+		String contractorMessageSubject = emailInfo.getTraineeName() + " Weekly Report: " + emailInfo.getWeekRange() + ", Created by: " + emailInfo.getContractorName();
 		String contractorMessageBody = "Add a link to the report here or add a pdf of the report";
 		SendEmailRequest emailForContractor = generateSendEmailRequest(emailInfo.getContractorEmail(), "norelpy@datareconreports.com", contractorMessageSubject, contractorMessageBody, null);
 		
-		String traineeMessageSubject = "Weekly Report: " + emailInfo.getWeekRange();
+		String traineeMessageSubject = emailInfo.getContractorName() +  " created Weekly Report: " + emailInfo.getWeekRange() + ", Created for: " + emailInfo.getTraineeName();
 		String traineeMessageBody = "Either add a link to the report here or add a pdf of the report (maybe add a link to rebuttal)";
 		SendEmailRequest emailForTrainee = generateSendEmailRequest(emailInfo.getTraineeEmail(), emailInfo.getContractorEmail(), traineeMessageSubject, traineeMessageBody, null);
 
@@ -293,6 +293,12 @@ public class GenericEmailServiceImpl implements GenericEmailService {
             helper.setText(Objects.requireNonNull(traineeMessageBody));
             helper.setSubject(Objects.requireNonNull(traineeMessageSubject));
             helper.setFrom(Objects.requireNonNull(emailInfo.getContractorEmail()));
+            javaMailSender.send(message);
+            
+            helper.setTo(Objects.requireNonNull(emailInfo.getContractorEmail()));
+            helper.setText(Objects.requireNonNull(contractorMessageBody));
+            helper.setSubject(Objects.requireNonNull(contractorMessageSubject));
+            helper.setFrom(Objects.requireNonNull(emailInfo.getTraineeEmail()));
             javaMailSender.send(message);
 		    
 		    /*
