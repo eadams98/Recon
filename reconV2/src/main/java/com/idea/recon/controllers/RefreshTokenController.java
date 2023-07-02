@@ -15,9 +15,11 @@ import com.idea.recon.config.JwtSchoolDetailsService;
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.config.JwtTraineeDetailsService;
 import com.idea.recon.entities.ContractorRefreshToken;
+import com.idea.recon.entities.SchoolRefreshToken;
 import com.idea.recon.entities.TraineeRefreshToken;
 import com.idea.recon.exceptions.RefreshTokenException;
 import com.idea.recon.services.ContractorRefreshTokenService;
+import com.idea.recon.services.SchoolRefreshTokenService;
 import com.idea.recon.services.TraineeRefreshTokenService;
 
 @RestController
@@ -38,6 +40,8 @@ public class RefreshTokenController {
 	private ContractorRefreshTokenService contractorRefreshTokenService;
 	@Autowired
 	private TraineeRefreshTokenService traineeRefreshTokenService;
+	@Autowired
+	private SchoolRefreshTokenService schoolRefreshTokenService;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -50,7 +54,7 @@ public class RefreshTokenController {
 				ContractorRefreshToken contractorRefreshToken = optionalContractorRefreshToken.orElseThrow(() -> new RefreshTokenException("Refresh.TOKEN_NOT_FOUND") );
 				contractorRefreshToken = contractorRefreshTokenService.verifyExpiration(contractorRefreshToken);
 				if (contractorRefreshToken != null) {
-					logger.info("Refresh Token Found");
+					logger.info("Contractor refresh Token Found");
 					return jwtTokenUtil.generateToken(contractorDetailsService.loadUserByUsername(contractorRefreshToken.getContractor().getEmail()));
 				}
 				break;
@@ -59,10 +63,18 @@ public class RefreshTokenController {
 				TraineeRefreshToken traineeRefreshToken = optionalTraineeRefreshToken.orElseThrow(() -> new RefreshTokenException("Refresh.TOKEN_NOT_FOUND") );
 				traineeRefreshToken = traineeRefreshTokenService.verifyExpiration(traineeRefreshToken);
 				if (traineeRefreshToken != null) {
-					logger.info("Refresh Token Found");
+					logger.info("Trainee refresh Token Found");
 					return jwtTokenUtil.generateToken(traineeDetailsService.loadUserByUsername(traineeRefreshToken.getTrainee().getEmail()));
 				}
 				break;
+			case "school":
+				Optional<SchoolRefreshToken> optionalSchoolRefreshToken = schoolRefreshTokenService.findByToken(token);
+				SchoolRefreshToken schoolRefreshToken = optionalSchoolRefreshToken.orElseThrow(() -> new RefreshTokenException("Refresh.TOKEN_NOT_FOUND"));
+				schoolRefreshToken = schoolRefreshTokenService.verifyExpiration(schoolRefreshToken);
+				if (schoolRefreshToken != null) {
+					logger.info("School refresh Token Found");
+					return jwtTokenUtil.generateToken(schoolDetailsService.loadUserByUsername(schoolRefreshToken.getSchool().getEmail()));
+				}
 		}
 		return "NULL";
 	}

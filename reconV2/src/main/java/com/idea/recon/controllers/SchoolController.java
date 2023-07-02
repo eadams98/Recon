@@ -10,10 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.idea.recon.config.JwtTokenUtil;
@@ -34,6 +36,7 @@ public class SchoolController {
 	@Autowired
 	JwtTokenUtil jwtTokenUtil;
 	
+	//MAKE THIS PAGINATION
 	@GetMapping(value = "/{id}/students")
 	@PreAuthorize("hasAuthority('school')")
 	ResponseEntity<Set<TraineeDTO>> getMyStudents(@PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
@@ -53,6 +56,22 @@ public class SchoolController {
 	ResponseEntity<String> updateMyDetails(@RequestBody SchoolDTO updateInfo, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(schoolService.updateMyDetails(updateInfo, token), HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/{id}/add-student")
+	@PreAuthorize("hasAuthority('school')")
+	ResponseEntity<String> addStudentToRoster(@PathVariable Integer id, @RequestParam(value = "sid") String studentEmail, @RequestHeader (name="Authorization") String token) throws Exception {
+		token = token.split(" ")[1];
+		Thread.sleep(10000);
+		return new ResponseEntity<>(schoolService.RegisterStudent(id, studentEmail, token), HttpStatus.CREATED);
+	}
+	
+	@PostMapping(value = "/{id}/add-contractor")
+	@PreAuthorize("hasAuthority('school')")
+	ResponseEntity<String> addContractorToRoster(@PathVariable Integer id, @RequestParam(value = "cid") String contractorEmail, @RequestHeader (name="Authorization") String token) throws Exception {
+		token = token.split(" ")[1];
+		Thread.sleep(10000);
+		return new ResponseEntity<>(schoolService.RegisterContractor(id, contractorEmail, token), HttpStatus.CREATED);
 	}
 	
 	

@@ -28,15 +28,29 @@ INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) VAL
 INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) VALUES("Trainee", "4", 1, "trainee.4@yahoo.com", 5);
 INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) VALUES("Trainee", "5", 2, "trainee.5@yahoo.com", 5);
 
+INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) Values("Trainee","6", 1, "trainee.6@yahoo.com", 5);
+INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) Values("Trainee","7", 1, "trainee.7@yahoo.com", 5);
+INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) Values("Trainee","8", 1, "trainee.8@yahoo.com", 5);
+INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) Values("Trainee","9", 1, "trainee.9@yahoo.com", 5);
+INSERT INTO Trainee(first_name, last_name, supervisor_id, email_id, role_id) Values("Trainee","10", 1, "trainee.10@yahoo.com", 5);
+
 -- user login
 
 INSERT Trainee_login(user_id, password, recovery_question, recovery_answer) VALUES(1, "$2a$10$rCbQgncvYiv/GztuN.GmbuDsG6IeptbC8Bs/nzIqTNxF1G2FtlrpW", "Birth Month?", "May"); -- //password
 INSERT Trainee_login(user_id, password, recovery_question, recovery_answer) VALUES(2, "$2a$10$FtZ0Y/xpHbWuQwlgEEo5ue6mmEnhLtLdggPoRRoEAPmQdFAJ3Pj1i", "Birth Month?", "May"); -- May@123
 
+-- School to Contractor
+INSERT School_to_Contractor(school_id, contractor_id, date_assigned) VALUES(1, 1, "1998-05-15");
+
 -- School to Trainee
 INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 1, "1998-05-15");
 INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 3, "2009-12-01");
 INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 2, "2012-08-08");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 4, "2012-08-08");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 5, "2012-08-08");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 6, "2012-08-08");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 7, "2012-08-08");
+INSERT School_to_Trainee(school_id, trainee_id, date_assigned) VALUES(1, 8, "2012-08-08");
 
 -- Role
 

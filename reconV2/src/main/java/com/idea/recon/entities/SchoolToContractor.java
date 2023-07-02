@@ -11,10 +11,10 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
-@Entity(name = "School_to_Trainee")
+@Entity(name = "School_to_Contractor")
 @Data
-public class SchoolToTrainee {
-	
+public class SchoolToContractor {
+
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -26,8 +26,7 @@ public class SchoolToTrainee {
 	private School school;
 	
 	@ManyToOne
-	@JoinColumn(name = "trainee_id")
-	private Trainee trainee; 
+	@JoinColumn(name = "contractor_id")
+	private Contractor contractor; 
 	
-
 }

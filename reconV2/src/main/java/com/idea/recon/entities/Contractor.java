@@ -40,6 +40,11 @@ public class Contractor {
     //@JoinColumn(name = "supervisor_id")
     private List<Trainee> trainees;
     
+    
+    // could belong to many schools. (Based on capacity of contractor/ how many students they can handle)
+    @OneToMany(mappedBy = "contractor")
+    private List<SchoolToContractor> schools; 
+    
     //Could be a list in future but for now just one
     @ManyToOne
     @JoinColumn(name= "role_id")

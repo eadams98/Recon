@@ -1,5 +1,7 @@
 package com.idea.recon.controllers;
 
+import java.util.Set;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,14 @@ public class TraineeController {
 	ResponseEntity<TraineeDTO> getMyDetails(@PathVariable Integer id, @RequestHeader(name="Authorization") String token) throws TraineeException {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(traineeService.getMyDetails(id, token), HttpStatus.OK);
+	}
+	
+	// Pagination needed so as not to have MILLIONS
+	// can only be accessed by school due to JwtRequestFilter. Must have a school token 
+	@GetMapping(value = "/unregistered")
+	ResponseEntity<Set<TraineeDTO>> getUnregisteredTrainees() throws TraineeException {
+		//token = token.split(" ")[1];
+		return new ResponseEntity<>(traineeService.getTraineesNotRegisteredToSchool(), HttpStatus.OK);
 	}
 	
 	@PutMapping(value = "/{id}")

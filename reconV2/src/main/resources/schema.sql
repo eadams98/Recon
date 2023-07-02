@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS User_login;
 DROP TABLE IF EXISTS Trainee_login;
 DROP TABLE IF EXISTS Contractor_to_Trainee;
 DROP TABLE IF EXISTS School_to_Trainee;
+DROP TABLE IF EXISTS School_to_Contractor;
 DROP TABLE IF EXISTS Traineerefreshtoken;
 DROP TABLE IF EXISTS Contractor_refresh_token;
 DROP TABLE IF EXISTS School_refresh_token;
@@ -27,6 +28,7 @@ CREATE TABLE Contractor (
 	last_name VARCHAR(20),
     email_id VARCHAR(50) UNIQUE,
     role_id INTEGER,
+    training_capacity INTEGER,
     password VARCHAR(100) NOT NULL,
     first_login BOOLEAN DEFAULT 1,
 	PRIMARY KEY (id),
@@ -84,6 +86,16 @@ CREATE TABLE School_to_Trainee (
 	PRIMARY KEY(id),
 	FOREIGN KEY (school_id) REFERENCES School(school_id),
 	FOREIGN KEY (trainee_id) REFERENCES Trainee(trainee_id)
+);
+
+CREATE TABLE School_to_Contractor (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	school_id INTEGER NOT NULL,
+	contractor_id INTEGER NOT NULL,
+	date_assigned Date,
+	PRIMARY KEY(id),
+	FOREIGN KEY (school_id) REFERENCES School(school_id),
+	FOREIGN KEY (contractor_id) REFERENCES Contractor(id)
 );
 
 DROP TABLE IF EXISTS Report;

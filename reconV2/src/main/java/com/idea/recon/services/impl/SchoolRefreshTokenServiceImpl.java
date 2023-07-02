@@ -43,11 +43,11 @@ public class SchoolRefreshTokenServiceImpl implements SchoolRefreshTokenService 
 	@Override
 	public SchoolRefreshToken verifyExpiration(SchoolRefreshToken token) {
 		if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-		      refreshTokenRepository.delete(token);
+		      //refreshTokenRepository.delete(token);
 		      //throw new RefreshTokenServiceImpl(token.getToken(), "Refresh token was expired. Please make a new signin request");
-		    }
+		}
 
-		    return token;
+		return token;
 	}
 
 	@Override
