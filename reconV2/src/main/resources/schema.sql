@@ -1,28 +1,28 @@
 use recon;
 
-DROP TABLE IF EXISTS Report;
-DROP TABLE IF EXISTS Contractor_to_User;
-DROP TABLE IF EXISTS User_login;
-DROP TABLE IF EXISTS Trainee_login;
-DROP TABLE IF EXISTS Contractor_to_Trainee;
-DROP TABLE IF EXISTS School_to_Trainee;
-DROP TABLE IF EXISTS School_to_Contractor;
-DROP TABLE IF EXISTS Traineerefreshtoken;
-DROP TABLE IF EXISTS Contractor_refresh_token;
-DROP TABLE IF EXISTS School_refresh_token;
+DROP TABLE IF EXISTS report;
+DROP TABLE IF EXISTS contractor_to_user;
+DROP TABLE IF EXISTS user_login;
+DROP TABLE IF EXISTS trainee_login;
+DROP TABLE IF EXISTS contractor_to_trainee;
+DROP TABLE IF EXISTS school_to_trainee;
+DROP TABLE IF EXISTS school_to_contractor;
+DROP TABLE IF EXISTS traineerefreshtoken;
+DROP TABLE IF EXISTS contractor_refresh_token;
+DROP TABLE IF EXISTS school_refresh_token;
 --
-DROP TABLE IF EXISTS Trainee;
-DROP TABLE IF EXISTS Contractor;
-DROP TABLE IF EXISTS School;
-DROP TABLE IF EXISTS Role;
+DROP TABLE IF EXISTS trainee;
+DROP TABLE IF EXISTS contractor;
+DROP TABLE IF EXISTS school;
+DROP TABLE IF EXISTS role;
 
-CREATE TABLE Role (
+CREATE TABLE role (
 	role_id INTEGER AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     PRIMARY KEY (role_id)
 );
 
-CREATE TABLE Contractor (
+CREATE TABLE contractor (
 	id iNTEGER NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR(20),
 	last_name VARCHAR(20),
@@ -35,7 +35,7 @@ CREATE TABLE Contractor (
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
 );
 
-CREATE TABLE Trainee (
+CREATE TABLE trainee (
 	trainee_id INTEGER NOT NULL AUTO_INCREMENT,
     supervisor_id INTEGER,
     role_id INTEGER,
@@ -49,7 +49,7 @@ CREATE TABLE Trainee (
 );
 
 
-CREATE TABLE School (
+CREATE TABLE school (
 	school_id iNTEGER NOT NULL AUTO_INCREMENT,
     role_id INTEGER,
     email_id VARCHAR(50) UNIQUE,
@@ -59,7 +59,7 @@ CREATE TABLE School (
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
 );
 
-DROP TABLE IF EXISTS Council;
+DROP TABLE IF EXISTS council;
 CREATE TABLE Council (
 	id iNTEGER NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR(20),
@@ -68,7 +68,7 @@ CREATE TABLE Council (
 );
 
 
-CREATE TABLE Contractor_to_Trainee (
+CREATE TABLE contractor_to_trainee (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	user_id INTEGER NOT NULL,
 	contractor_id INTEGER NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE Contractor_to_Trainee (
 	FOREIGN KEY (contractor_id) REFERENCES Contractor(id)
 );
 
-CREATE TABLE School_to_Trainee (
+CREATE TABLE school_to_trainee (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	school_id INTEGER NOT NULL,
 	trainee_id INTEGER NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE School_to_Trainee (
 	FOREIGN KEY (trainee_id) REFERENCES Trainee(trainee_id)
 );
 
-CREATE TABLE School_to_Contractor (
+CREATE TABLE school_to_contractor (
 	id INTEGER NOT NULL AUTO_INCREMENT,
 	school_id INTEGER NOT NULL,
 	contractor_id INTEGER NOT NULL,
@@ -98,8 +98,8 @@ CREATE TABLE School_to_Contractor (
 	FOREIGN KEY (contractor_id) REFERENCES Contractor(id)
 );
 
-DROP TABLE IF EXISTS Report;
-CREATE TABLE Report (
+DROP TABLE IF EXISTS report;
+CREATE TABLE report (
 	report_id INTEGER NOT NULL AUTO_INCREMENT,
 	title VARCHAR(50),
 	description VARCHAR(255),
@@ -120,7 +120,7 @@ CREATE TABLE Report (
 -- 
 
 
-CREATE TABLE Trainee_login (
+CREATE TABLE trainee_login (
 	login_id INTEGER AUTO_INCREMENT,
 	user_id INTEGER NOT NULL,
 	password VARCHAR(100) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE Trainee_login (
 	
 );
 
-CREATE TABLE Traineerefreshtoken (
+CREATE TABLE traineerefreshtoken (
 	id INTEGER AUTO_INCREMENT,
     trainee_id INTEGER,
     token VARCHAR(50) UNIQUE NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE Traineerefreshtoken (
     FOREIGN KEY(trainee_id) REFERENCES Trainee(trainee_id)
 );
 
-CREATE TABLE Contractor_refresh_token (
+CREATE TABLE contractor_refresh_token (
 	id INTEGER AUTO_INCREMENT,
     contractor_id INTEGER,
     token VARCHAR(50) UNIQUE NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE Contractor_refresh_token (
     FOREIGN KEY(contractor_id) REFERENCES Contractor(id)
 );
 
-CREATE TABLE School_refresh_token (
+CREATE TABLE school_refresh_token (
 	id INTEGER AUTO_INCREMENT,
     school_id INTEGER,
     token VARCHAR(50) UNIQUE NOT NULL,

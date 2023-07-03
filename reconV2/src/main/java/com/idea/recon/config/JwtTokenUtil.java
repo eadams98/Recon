@@ -40,6 +40,12 @@ public class JwtTokenUtil implements Serializable {
 	
 	  @Value("${jwtExpirationMs}")
 	  private int jwtExpirationMs;
+	  
+	public String getRoleFromToken(String token) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
+		logger.info("clams: "+ getAllClaimsFromToken(token).toString());
+		
+		return getAllClaimsFromToken(token).get("role", String.class);
+	}
 
 	public String getUsernameFromToken(String token) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
 		return getClaimFromToken(token, Claims::getSubject);
@@ -80,6 +86,7 @@ public class JwtTokenUtil implements Serializable {
 
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("role", userDetails.getAuthorities().toArray()[0].toString());
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 
