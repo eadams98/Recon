@@ -1,5 +1,7 @@
 package com.idea.recon.controllers;
 
+import java.net.URL;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.S3Object;
 import com.idea.recon.config.JwtContractorDetailsService;
 import com.idea.recon.config.JwtSchoolDetailsService;
 import com.idea.recon.config.JwtTokenUtil;
@@ -68,6 +72,9 @@ public class JwtAuthenticationController {
 	@Autowired
 	SchoolRefreshTokenService schoolRefreshTokenService;
 	
+	@Autowired
+	private AmazonS3 s3Client;
+	
 	@GetMapping(value="/test", produces="application/json")
 	public ResponseEntity<String> helloWorld() {
 		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
@@ -98,7 +105,8 @@ public class JwtAuthenticationController {
 								traineeDetails.getTrainee().getTraineeId(),
 								traineeDetails.getTrainee().getFirstName() + " " + traineeDetails.getTrainee().getLastName(),
 								traineeDetails.getTrainee().getEmail(), 
-								userDetails.getAuthorities()
+								userDetails.getAuthorities(),
+								getProfilePicURL(traineeDetails.getTrainee().getEmail())
 						)
 				);
 			case "contractor":
@@ -117,7 +125,8 @@ public class JwtAuthenticationController {
 								contractorDetails.getId(),
 								contractorDetails.getFirstName() + " " + contractorDetails.getLastName(),
 								contractorDetails.getEmail(), 
-								userDetails.getAuthorities()
+								userDetails.getAuthorities(),
+								getProfilePicURL(contractorDetails.getEmail())
 						)
 				);
 				
@@ -137,7 +146,8 @@ public class JwtAuthenticationController {
 								SchoolDetails.getSchoolId(),
 								SchoolDetails.getSchoolName(),
 								SchoolDetails.getEmail(), 
-								userDetails.getAuthorities()
+								userDetails.getAuthorities(),
+								getProfilePicURL(SchoolDetails.getEmail())
 						)
 				);
 				
@@ -190,5 +200,23 @@ public class JwtAuthenticationController {
 		} catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
+	}
+	
+	private String getProfilePicURL(String email) {
+		try {
+			String bucketName = "my-java-aws-recon-bucket";
+			String fileName = email.replace(".", "");
+			boolean doesPhotoExist = s3Client.doesObjectExist(bucketName, fileName);
+			if (doesPhotoExist) {
+				S3Object s = s3Client.getObject(bucketName, fileName);
+				URL url = s3Client.getUrl(bucketName, fileName);
+				return url.toString();
+				 
+			}			
+			
+		} catch (Exception ex) {
+			return "";
+		}
+		return "";
 	}
 }

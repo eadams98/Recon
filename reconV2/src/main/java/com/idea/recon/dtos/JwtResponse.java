@@ -21,13 +21,15 @@ public class JwtResponse implements Serializable {
 	private String username;
 	private String email;
 	private Collection<? extends GrantedAuthority> roles; //List<String> roles;
+	private String pictureURL; 
 
-	public JwtResponse(String accessToken, String refreshToken, Integer integer, String username, String email, Collection<? extends GrantedAuthority> collection) {
+	public JwtResponse(String accessToken, String refreshToken, Integer integer, String username, String email, Collection<? extends GrantedAuthority> collection, String pictureURL) {
 		this.token = accessToken;
 		this.refreshToken = refreshToken;
 		this.id = integer;
 		this.username = username;
 		this.email = email;
 		this.roles = collection;
+		this.pictureURL = pictureURL;
 	}
 }

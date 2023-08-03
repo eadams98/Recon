@@ -2,6 +2,7 @@ package com.idea.recon.services.impl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,11 +21,15 @@ import com.idea.recon.dtos.ContractorDTO;
 import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Contractor;
+import com.idea.recon.entities.School;
 import com.idea.recon.entities.Trainee;
 import com.idea.recon.exceptions.ContractorException;
+import com.idea.recon.exceptions.SchoolException;
 import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.repositories.ContractorRepository;
+import com.idea.recon.repositories.SchoolToContractorRepository;
 import com.idea.recon.services.ContractorService;
+import com.idea.recon.services.SchoolService;
 import com.idea.recon.services.TraineeService;
 
 @Service
@@ -36,8 +41,14 @@ public class ContractorServiceImpl implements ContractorService {
 	@Autowired 
 	TraineeService traineeService;
 	
+	/*@Autowired
+	SchoolService schoolServie;*/
+	
 	@Autowired
 	ContractorRepository contractoryRepository;
+	
+	@Autowired 
+	SchoolToContractorRepository schoolToContractorRepository;
 	
 	@Autowired
 	@Qualifier("jwtContractorDetailsService")
@@ -210,6 +221,30 @@ public class ContractorServiceImpl implements ContractorService {
 		// Could be abstracted out to AOP END*/
 
 		return true;
+	}
+
+	/*@Override
+	public Set<ContractorDTO> getContractorsNotRegisteredToThisSchool(String schoolEmail) throws ContractorException, SchoolException {
+		
+		School school = schoolServie.getSchoolByEmail(schoolEmail);
+		Set<ContractorDTO> contractorsNotAttachedToThisSchool = new HashSet<>();
+		schoolToContractorRepository.getContractorsNotAssignedToSchool(school).forEach(c -> {
+			contractorsNotAttachedToThisSchool.add( ContractorDTO.builder()
+				.firstName(c.getFirstName())
+				.lastName(c.getLastName())
+				.email(c.getEmail())
+				//.id(null)
+				.build()
+			);
+		});
+		return contractorsNotAttachedToThisSchool;
+	}*/
+
+	@Override
+	public Contractor getContractorByEmail(String email) throws ContractorException {
+		Optional<Contractor> optionalContractor = contractoryRepository.getByEmail(email);
+		
+		return optionalContractor.orElseThrow(() -> new ContractorException("Contractor.NOT_FOUND"));
 	}
 
 }

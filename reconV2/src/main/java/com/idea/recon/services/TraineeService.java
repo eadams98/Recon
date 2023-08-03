@@ -1,5 +1,7 @@
 package com.idea.recon.services;
 
+import java.util.Set;
+
 import com.idea.recon.dtos.ContractorDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Trainee;
@@ -12,5 +14,6 @@ public interface TraineeService {
 	String updateMyDetails(TraineeDTO updateInfo, String token) throws TraineeException;
 	
 	Trainee getTraineeByEmail(String email) throws TraineeException;
+	Set<TraineeDTO> getTraineesNotRegisteredToSchool() throws TraineeException;
 
 }

@@ -25,6 +25,7 @@ import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Trainee;
 import com.idea.recon.exceptions.ContractorException;
+import com.idea.recon.services.ConnectionService;
 import com.idea.recon.services.ContractorService;
 
 @CrossOrigin
@@ -36,6 +37,9 @@ public class ContractorController {
 	
 	@Autowired
 	ContractorService contractorService;
+	
+	@Autowired
+	ConnectionService connectionService;
 	
 	@Autowired
 	JwtTokenUtil jwtTokenUtil;
@@ -80,6 +84,11 @@ public class ContractorController {
 	ResponseEntity<Boolean> getContractorId(@PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws ContractorException, Exception {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(contractorService.confirmAccessRequest(id, token), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/unregistered-to-school")
+	ResponseEntity<Set<ContractorDTO>> getContractorsNotAssignedToThisSchool(@RequestParam(value = "se") String schoolEmail) throws ContractorException, Exception {
+		return new ResponseEntity<>(connectionService.getContractorsNotRegisteredToThisSchool(schoolEmail), HttpStatus.OK);
 	}
 
 }

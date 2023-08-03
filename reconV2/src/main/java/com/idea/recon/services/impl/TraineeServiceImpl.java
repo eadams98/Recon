@@ -1,5 +1,8 @@
 package com.idea.recon.services.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.transaction.Transactional;
 
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import com.idea.recon.entities.Contractor;
 import com.idea.recon.entities.Trainee;
 import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.TraineeException;
+import com.idea.recon.repositories.SchoolToTraineeRepository;
 import com.idea.recon.repositories.TraineeRepository;
 import com.idea.recon.services.TraineeService;
 
@@ -28,6 +32,9 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 	
 	@Autowired
 	TraineeRepository traineeRepository;
+	
+	@Autowired 
+	SchoolToTraineeRepository schoolToTraineeRepository;
 	
 	@Autowired
 	@Qualifier("jwtTraineeDetailsService")
@@ -138,6 +145,22 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 	@Override
 	public Trainee getTraineeByEmail(String email) throws TraineeException {
 		return traineeRepository.getByEmail(email).orElseThrow(() -> new TraineeException("Trainee.NOT_FOUND"));
+	}
+
+	@Override
+	public Set<TraineeDTO> getTraineesNotRegisteredToSchool() throws TraineeException {
+		Set<TraineeDTO> unassignedTraineeDTOs = new HashSet<>();
+		schoolToTraineeRepository.getTraineesNotAssinedToSchool().forEach(t -> {
+			// could just make a convert method of Trainee and TraineeDTO
+			unassignedTraineeDTOs.add( 
+					TraineeDTO.builder()
+					.firstName(t.getFirstName())
+					.lastName(t.getLastName())
+					.email(t.getEmail())
+					.build()
+			);
+		});
+		return unassignedTraineeDTOs;
 	}
 	
 
