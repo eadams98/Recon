@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idea.recon.dto.ContractorAndTraineeCorrespondenceDTO;
 import com.idea.recon.dto.RelationshipVerificationDTO;
 import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.entity.Report;
@@ -127,7 +128,7 @@ public class ReportServiceImpl implements ReportService {
 		LocalDate endOfWeek = reportDTO.getWeekEndDate() != null ? getEndOfWeek(reportDTO.getWeekEndDate()) : getEndOfWeek(LocalDate.now());
 		LocalDate currentDate = LocalDate.now();
 		
-		if (reportRepository.contractorReportExist(response.getBody().getById(), response.getBody().getForId(), startOfWeek, endOfWeek, currentDate))
+		if (reportRepository.contractorReportExist(response.getBody().getById(), response.getBody().getForId(), startOfWeek, endOfWeek))
 			throw new ReportException("Report.Contractor.DUPLICATE_REPORT");
 		
 		Report report = Report.builder()
@@ -142,6 +143,7 @@ public class ReportServiceImpl implements ReportService {
 				.build();
 		
 		report = reportRepository.save(report);
+		//ResponseEntity<String> emailResponse = sendCreatedReportEmail(token, response.getBody().getByName(), reportDTO.getSentByEmail(), response.getBody().getForName(), reportDTO.getSentForEmail(), report.toReportDTO(response.getBody().getByEmail(), response.getBody().getForEmail()));
 
 		logger.info(report.toString());
 		
@@ -227,6 +229,39 @@ public class ReportServiceImpl implements ReportService {
 		ResponseEntity<RelationshipVerificationDTO> response = null; 
 		try {
 			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			logger.info("AFTER RESPONE: " + response.getBody().toString());
+		} catch (Exception ex) {
+			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
+			logger.info("RESPONSE FROM USER MS CALL: " + ex.getClass().toString()); 
+		}
+		
+		return response;
+    }
+    
+    private ResponseEntity<String> sendCreatedReportEmail(String token, String sentByName, String sentByEmail, String sentForName, String sentForEmail, ReportDTO report) throws MicroserviceException {
+    	HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + token);
+		
+		String url = "http://email-service/email/report-created";
+		ResponseEntity<String> response = null; 
+		
+		ContractorAndTraineeCorrespondenceDTO data = ContractorAndTraineeCorrespondenceDTO.builder()
+				.weekRange(report.getWeekStartDate() + " - " + report.getWeekEndDate())
+				.reportDTO(report)
+				.contractorName(sentByName)
+				.contractorEmail("eric051598@gmail.com")
+				.contractorMessageSubject("")
+				.contractorMessageBody("")
+				.traineeName(sentForName)
+				.traineeEmail("eric051598@gmail.com")
+				.traineeMessageSubject("")
+				.traineeMessageBody("")
+				.build();
+		HttpEntity<ContractorAndTraineeCorrespondenceDTO> entity = new HttpEntity<>(data, headers);
+
+		try {
+			response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+			//restTemplate.postFor
 			logger.info("AFTER RESPONE: " + response.getBody().toString());
 		} catch (Exception ex) {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);

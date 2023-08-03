@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.enums.Grade;
 
 import lombok.AllArgsConstructor;
@@ -53,6 +54,21 @@ public class Report {
 	 */
 	//private String sentByEmail;
 	//private String sentForEmail;
+	
+	public ReportDTO toReportDTO(String sentBy, String sentFor) {
+		return ReportDTO.builder()
+				.reportId(reportId)
+				.title(title)
+				.description(description)
+				.rebuttal(Rebuttal)
+				.grade(grade.name())
+				.submissionDate(submissionDate)
+				.weekStartDate(weekStartDate)
+				.weekEndDate(weekEndDate)
+				.sentByEmail(sentBy)
+				.sentForEmail(sentFor)
+				.build();
+	}
 	
 
 }

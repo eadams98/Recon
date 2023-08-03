@@ -31,6 +31,9 @@ public class School {
     @OneToMany(mappedBy = "school")
     private List<SchoolToTrainee> students;
     
+    @OneToMany(mappedBy = "school")
+    private List<SchoolToContractor> contractors;
+    
     @ManyToOne
     @JoinColumn(name= "role_id")
     Role role;

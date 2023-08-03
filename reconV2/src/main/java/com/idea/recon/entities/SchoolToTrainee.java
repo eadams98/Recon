@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
-@Entity(name = "School_to_trainee")
+@Entity(name = "School_to_Trainee")
 @Data
 public class SchoolToTrainee {
 	

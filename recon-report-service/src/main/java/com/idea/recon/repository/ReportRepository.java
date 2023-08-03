@@ -24,8 +24,8 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 
 	@Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
 		       "FROM Report r " +
-		       "WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND :currentDate BETWEEN :startOfWeek AND :endOfWeek")
-	Boolean contractorReportExist(Integer contractorId, Integer traineeId, LocalDate startOfWeek, LocalDate endOfWeek, LocalDate currentDate);
+		       "WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND week_start_date = :startOfWeek AND week_end_date = :endOfWeek")
+	Boolean contractorReportExist(Integer contractorId, Integer traineeId, LocalDate startOfWeek, LocalDate endOfWeek);
 	
 	@Query("SELECT r " +
 		       "FROM Report r " +
