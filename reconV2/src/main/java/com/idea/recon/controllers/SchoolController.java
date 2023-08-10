@@ -53,8 +53,9 @@ public class SchoolController {
 	
 	@PutMapping(value = "/{id}")
 	@PreAuthorize("hasAuthority('school')")
-	ResponseEntity<String> updateMyDetails(@RequestBody SchoolDTO updateInfo, @RequestHeader (name="Authorization") String token) throws Exception {
+	ResponseEntity<String> updateMyDetails(@RequestBody SchoolDTO updateInfo, @PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
+		updateInfo.setSchoolId(id);
 		return new ResponseEntity<>(schoolService.updateMyDetails(updateInfo, token), HttpStatus.OK);
 	}
 	

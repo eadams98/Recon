@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.dtos.ContractorDTO;
+import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Contractor;
 import com.idea.recon.entities.Trainee;
@@ -22,13 +23,20 @@ import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.repositories.SchoolToTraineeRepository;
 import com.idea.recon.repositories.TraineeRepository;
+import com.idea.recon.services.ContractorService;
 import com.idea.recon.services.TraineeService;
+import com.idea.recon.services.VerificationService;
 
 @Service
 @Transactional
 public class TraineeServiceImpl implements TraineeService {
 	
 private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	//@Autowired
+	//ContractorService contractorService;
+	//@Autowired
+	//Verification verficationService;
 	
 	@Autowired
 	TraineeRepository traineeRepository;
@@ -63,6 +71,7 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 		ContractorDTO supervisor = null;
 		if (foundTrainee.getSupervisor() != null) {
 			supervisor = ContractorDTO.builder()
+					.id(foundTrainee.getSupervisor().getId())
 					.email(foundTrainee.getSupervisor().getEmail())
 					.firstName(foundTrainee.getSupervisor().getFirstName())
 					.lastName(foundTrainee.getSupervisor().getLastName())
@@ -163,5 +172,37 @@ private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass())
 		return unassignedTraineeDTOs;
 	}
 	
+	@Override
+	public RelationshipVerificationDTO confirmContractorTraineeConnection(String contractorEmail, String traineeEmail, String token) throws ContractorException, TraineeException {
+			return null;	/*
+		// Could be abstracted out to AOP START
+		UserDetails user = jwtTraineeDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		logger.info("user authorities: " + user.getAuthorities());
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		logger.info("user authorities contains 'admin': " + isAdmin);
+		
+		Trainee foundTrainee = traineeRepository.getByEmail(traineeEmail).get();
+		boolean isSameTrainee = traineeRepository.getByEmail(user.getUsername()).get() == foundTrainee;
+		logger.info("requestor id and contractor id match': " + isSameTrainee);
+		//logger.info(user.getUsername() + " vs ");
+		
+		if (!isAdmin && !isSameTrainee)
+			throw new ContractorException("Contractor.JWT_USER_CONTRACTOR_MISMATCH");
+		// Could be abstracted out to AOP END
+		
+		
+		Contractor contractor = contractorService.getContractorByEmail(contractorEmail);
+		if (!contractor.getTrainees().contains(foundTrainee))
+			throw new ContractorException("Contractor.TRAINEE_NOT_LINKED"); // change mapping. this is same as contractor
+		
+		RelationshipVerificationDTO relationship = RelationshipVerificationDTO.builder()
+				.byId(contractor.getId())
+				.byName(contractor.getFirstName() + " " + contractor.getLastName())
+				.forId(foundTrainee.getTraineeId())
+				.forName(foundTrainee.getFirstName() + " " + foundTrainee.getLastName())
+				.build();
+		
+		return relationship;*/
+	}
 
 }

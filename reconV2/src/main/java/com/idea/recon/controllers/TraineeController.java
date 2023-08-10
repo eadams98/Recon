@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.dtos.ContractorDTO;
+import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.services.TraineeService;
+import com.idea.recon.services.VerificationService;
+import com.idea.recon.services.impl.VerificationServiceImpl;
 
 @CrossOrigin
 @Controller
@@ -33,7 +37,11 @@ public class TraineeController {
 	TraineeService traineeService;
 	
 	@Autowired
+	VerificationService verificationService;
+	
+	@Autowired
 	JwtTokenUtil jwtTokenUtil;
+
 	
 	@GetMapping(value = "/{id}/contractor")
 	@PreAuthorize("hasAuthority('trainee')")
@@ -59,9 +67,13 @@ public class TraineeController {
 	
 	@PutMapping(value = "/{id}")
 	@PreAuthorize("hasAuthority('trainee')")
-	ResponseEntity<String> updateMyDetails(@RequestBody TraineeDTO updateInfo, @RequestHeader(name="Authorization") String token) throws TraineeException {
+	ResponseEntity<String> updateMyDetails(@RequestBody TraineeDTO updateInfo, @PathVariable Integer id, @RequestHeader(name="Authorization") String token) throws TraineeException {
 		token = token.split(" ")[1];
+		updateInfo.setTraineeId(id);
 		return new ResponseEntity<>(traineeService.updateMyDetails(updateInfo, token), HttpStatus.OK);
 	}
+	
+	
+	
 
 }

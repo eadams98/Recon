@@ -3,8 +3,10 @@ package com.idea.recon.services;
 import java.util.Set;
 
 import com.idea.recon.dtos.ContractorDTO;
+import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.entities.Trainee;
+import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.TraineeException;
 
 public interface TraineeService {
@@ -16,4 +18,6 @@ public interface TraineeService {
 	Trainee getTraineeByEmail(String email) throws TraineeException;
 	Set<TraineeDTO> getTraineesNotRegisteredToSchool() throws TraineeException;
 
+	//helper
+	RelationshipVerificationDTO confirmContractorTraineeConnection(String contractorEmail, String traineeEmail, String token) throws ContractorException, TraineeException;
 }

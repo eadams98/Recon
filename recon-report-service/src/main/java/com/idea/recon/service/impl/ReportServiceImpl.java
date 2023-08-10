@@ -73,6 +73,7 @@ public class ReportServiceImpl implements ReportService {
 		logger.info(report.toString()); 
 		
 		String rebuttal = report.getRebuttal() == null ? "" : report.getRebuttal();
+		String title = report.getTitle() == null ? "" : report.getTitle();
 		
 		return ReportDTO.builder()
 				.reportId(report.getReportId())
@@ -83,7 +84,7 @@ public class ReportServiceImpl implements ReportService {
 				.weekStartDate(report.getWeekStartDate())
 				.weekEndDate(report.getWeekEndDate())
 				//.sentForEmail(forEmail)
-				.title(report.getTitle())
+				.title(title)
 				.build();
 	}
 	
@@ -91,9 +92,11 @@ public class ReportServiceImpl implements ReportService {
 	@Transactional
 	public ReportDTO updateReport(ReportDTO reportDTO, String token) throws ReportException, Exception {
 		
+		logger.info("Before update find report " + reportDTO.getReportId());
 		// Verify that this report exists
 		Report report = reportRepository.findById(reportDTO.getReportId()).orElseThrow(() -> new ReportException("Report.NOT_FOUND"));
-		
+		logger.info("After update find report");
+
 		// Verify If contractor or Admin (If contractor does this report belong to them, if not throw error)
 		
 		
@@ -143,7 +146,7 @@ public class ReportServiceImpl implements ReportService {
 				.build();
 		
 		report = reportRepository.save(report);
-		//ResponseEntity<String> emailResponse = sendCreatedReportEmail(token, response.getBody().getByName(), reportDTO.getSentByEmail(), response.getBody().getForName(), reportDTO.getSentForEmail(), report.toReportDTO(response.getBody().getByEmail(), response.getBody().getForEmail()));
+		ResponseEntity<String> emailResponse = sendCreatedReportEmail(token, response.getBody().getByName(), reportDTO.getSentByEmail(), response.getBody().getForName(), reportDTO.getSentForEmail(), report.toReportDTO(response.getBody().getByEmail(), response.getBody().getForEmail()));
 
 		logger.info(report.toString());
 		
@@ -225,7 +228,7 @@ public class ReportServiceImpl implements ReportService {
 		
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
-		String url = "http://user-service/contractor/verify?by=" + sentByEmail + "&for=" + sentForEmail;
+		String url = "http://user-service/verify/contractor-to-trainee?by=" + sentByEmail + "&for=" + sentForEmail;
 		ResponseEntity<RelationshipVerificationDTO> response = null; 
 		try {
 			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);

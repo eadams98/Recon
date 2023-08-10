@@ -94,8 +94,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			
 			logger.info(request.getRequestURI());
+			
 			UserDetails userDetails;
-			if (request.getRequestURI().startsWith("/trainee") && !request.getRequestURI().startsWith("/trainee/unregistered") ||
+			if(request.getRequestURI().startsWith("/verify/contractor-to-trainee")) {
+				String role = jwtTokenUtil.getRoleFromToken(jwtToken);
+				if (role.equalsIgnoreCase("trainee")) {
+					try {
+						logger.info("JwtRequestFilter: use TraineeDetailsService"); 
+			            userDetails = jwtTraineeDetailsService.loadUserByUsername(username);
+					} catch( Exception ex) {
+						handlerExceptionResolver.resolveException(request, response, null, ex);
+						return;
+		        	}
+				} else if (role.equalsIgnoreCase("contractor")) {
+					try {
+			        	logger.info("JwtRequestFilter: use ContractorDetailsService");  
+			            userDetails = jwtContractorDetailsService.loadUserByUsername(username);
+		        	} catch (Exception ex) {
+						handlerExceptionResolver.resolveException(request, response, null, ex);
+						return;
+		        	}
+				} else { 
+					handlerExceptionResolver.resolveException(request, response, null, new Exception("NOOOO"));
+					return;
+				}
+			}
+			else if (request.getRequestURI().startsWith("/trainee") && !request.getRequestURI().startsWith("/trainee/unregistered") ||
 					(request.getRequestURI().startsWith("/bucket") && jwtTokenUtil.getRoleFromToken(jwtToken).equals("trainee"))) {
 				try {
 					logger.info("JwtRequestFilter: use TraineeDetailsService"); 

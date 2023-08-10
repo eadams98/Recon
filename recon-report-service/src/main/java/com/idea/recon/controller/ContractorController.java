@@ -42,8 +42,9 @@ public class ContractorController {
 	}
 	
 	@PutMapping("/update-report")
-	ResponseEntity<ReportDTO> updateReport(@RequestBody ReportDTO reportDTO, @RequestHeader (name="Authorization") String token) throws ReportException, Exception {
+	ResponseEntity<ReportDTO> updateReport(@RequestBody ReportDTO reportDTO, @RequestParam("revision") Boolean isRevision, @RequestHeader (name="Authorization") String token) throws ReportException, Exception {
 		token = token.split(" ")[1];
+		logger.info("isRevision: " + isRevision);
 		return new ResponseEntity<>(reportService.updateReport(reportDTO, token), HttpStatus.OK);
 	}
 	

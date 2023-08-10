@@ -65,8 +65,9 @@ public class ContractorController {
 	
 	@PutMapping(value = "/{id}")
 	@PreAuthorize("hasAuthority('contractor')")
-	ResponseEntity<String> updateMyDetails(@RequestBody ContractorDTO updateInfo, @RequestHeader (name="Authorization") String token) throws Exception {
+	ResponseEntity<String> updateMyDetails(@RequestBody ContractorDTO updateInfo, @PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
+		updateInfo.setId(id);
 		return new ResponseEntity<>(contractorService.updateMyDetails(updateInfo, token), HttpStatus.OK);
 	}
 	
