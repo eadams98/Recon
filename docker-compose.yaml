@@ -6,5 +6,19 @@ services:
       - ./env/mysql.env
     volumes:
       - /Users/repoleved/Desktop/docker/recon-mysql:/var/lib/mysql
+  eureka:
+    build: 
+      context: ./recon-discovery-service
+      dockerfile: Dockerfile
     ports:
-      - 3306:3306
+      - 8761:8761
+  recon-core:
+    build:
+      context: ./reconV2
+      dockerfile: Dockerfile
+    ports:
+      - 4000:4000
+    depends_on:
+      - eureka
+      - mysql
+
