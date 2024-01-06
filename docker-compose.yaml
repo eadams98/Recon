@@ -10,14 +10,18 @@ services:
     build: 
       context: ./recon-discovery-service
       dockerfile: Dockerfile
+    env_file:
+      - env/recon-eureka.env
     ports:
-      - 8761:8761
+      - $RECON_EUREKA_HOST_PORT:$RECON_EUREKA_APP_PORT
   recon-core:
     build:
       context: ./reconV2
       dockerfile: Dockerfile
+    env_file:
+      - env/recon-core.env
     ports:
-      - 4000:4000
+      - $RECON_CORE_HOST_PORT:$RECON_CORE_APP_PORT
     depends_on:
       - eureka
       - mysql
@@ -25,8 +29,10 @@ services:
     build:
       context: ./recon-report-service
       dockerfile: Dockerfile
+    env_file:
+      - ./env/recon-report.env
     ports:
-      - 4001:4001
+      - $RECON_REPORT_HOST_PORT:$RECON_REPORT_APP_PORT
     depends_on:
       - eureka
       - mysql
@@ -34,8 +40,10 @@ services:
     build:
       context: ./recon-email-service
       dockerfile: Dockerfile
+    env_file:
+      - env/recon-email.env
     ports:
-      - 4002:4002
+      - $RECON_EMAIL_HOST_PORT:$RECON_EMAIL_APP_PORT
     depends_on:
       - eureka
       - mysql

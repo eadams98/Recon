@@ -1,5 +1,5 @@
 server:
-  port: 8761
+  port: ${APP_PORT}
   #port: 4000
   
 eureka:
