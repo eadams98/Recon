@@ -21,4 +21,22 @@ services:
     depends_on:
       - eureka
       - mysql
+  recon-reports:
+    build:
+      context: ./recon-report-service
+      dockerfile: Dockerfile
+    ports:
+      - 4001:4001
+    depends_on:
+      - eureka
+      - mysql
+  recon-email:
+    build:
+      context: ./recon-email-service
+      dockerfile: Dockerfile
+    ports:
+      - 4002:4002
+    depends_on:
+      - eureka
+      - mysql
 
