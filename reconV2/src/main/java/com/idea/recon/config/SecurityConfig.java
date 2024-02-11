@@ -173,7 +173,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
-        logger.info("configuration: " + configuration.getAllowedOrigins());
+        //logger.info("configuration: " + configuration.getAllowedOrigins());
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
