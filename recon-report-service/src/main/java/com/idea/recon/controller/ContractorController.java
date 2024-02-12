@@ -34,6 +34,12 @@ public class ContractorController {
 	@Autowired
 	ReportService reportService;
 	
+	@GetMapping("test")
+	ResponseEntity<String> createReport() throws Exception {
+		logger.info("HIT TEST");
+		return new ResponseEntity<>("Hit Report MS", HttpStatus.CREATED);
+	}
+	
 	@PostMapping("/create-report")
 	ResponseEntity<String> createReport(@RequestBody ReportDTO reportDTO, @RequestHeader (name="Authorization") String token) throws Exception {
 		logger.info("HIT CREATE");
