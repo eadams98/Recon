@@ -7,14 +7,17 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.idea.recon.config.JwtTokenUtil;
 import com.idea.recon.dtos.RelationshipVerificationDTO;
 import com.idea.recon.entities.Contractor;
+import com.idea.recon.entities.School;
 import com.idea.recon.entities.Trainee;
 import com.idea.recon.exceptions.ContractorException;
 import com.idea.recon.exceptions.TraineeException;
 import com.idea.recon.repositories.ContractorRepository;
+import com.idea.recon.repositories.SchoolRepository;
 import com.idea.recon.repositories.TraineeRepository;
 import com.idea.recon.services.ContractorService;
 import com.idea.recon.services.TraineeService;
@@ -43,7 +46,14 @@ public class VerificationServiceImpl implements VerificationService {
 	@Autowired
 	@Qualifier("jwtContractorDetailsService")
 	private UserDetailsService jwtContractorDetailsService;
-	
+
+	@Autowired
+	@Qualifier("jwtSchoolDetailsService")
+	private UserDetailsService jwtSchoolDetailsService;
+
+	@Autowired
+	SchoolRepository schoolRepository;
+
 	public RelationshipVerificationDTO route(String contractorEmail, String traineeEmail, String token) throws ContractorException, TraineeException {
 		String role = jwtTokenUtil.getRoleFromToken(token);
 		if (role.equalsIgnoreCase("trainee"))
@@ -115,6 +125,36 @@ public class VerificationServiceImpl implements VerificationService {
 				.build();
 		
 		return relationship;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public RelationshipVerificationDTO routeSchool(String contractorEmail, String traineeEmail, String token)
+			throws ContractorException, TraineeException {
+		UserDetails user = jwtSchoolDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(token));
+		boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("admin"));
+		School school = schoolRepository.getByEmail(user.getUsername())
+				.orElseThrow(() -> new ContractorException("School.NOT_FOUND"));
+		Trainee trainee = traineeService.getTraineeByEmail(traineeEmail);
+
+		if (!isAdmin) {
+			boolean schoolHasTrainee = school.getStudents() != null && school.getStudents().stream()
+					.anyMatch(st -> st.getTrainee() != null
+							&& st.getTrainee().getTraineeId().equals(trainee.getTraineeId()));
+			if (!schoolHasTrainee)
+				throw new ContractorException("Contractor.TRAINEE_NOT_LINKED");
+		}
+
+		Contractor contractor = contractorService.getContractorByEmail(contractorEmail);
+		if (!contractor.getTrainees().contains(trainee))
+			throw new ContractorException("Contractor.TRAINEE_NOT_LINKED");
+
+		return RelationshipVerificationDTO.builder()
+				.byId(contractor.getId())
+				.byName(contractor.getFirstName() + " " + contractor.getLastName())
+				.forId(trainee.getTraineeId())
+				.forName(trainee.getFirstName() + " " + trainee.getLastName())
+				.build();
 	}
 
 }

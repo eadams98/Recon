@@ -96,7 +96,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			logger.info(request.getRequestURI());
 			
 			UserDetails userDetails;
-			if(request.getRequestURI().startsWith("/verify/contractor-to-trainee")) {
+			if (request.getRequestURI().startsWith("/verify/contractor-to-trainee")
+					|| request.getRequestURI().startsWith("/verify/trainee/contractor-to-trainee")) {
 				String role = jwtTokenUtil.getRoleFromToken(jwtToken);
 				if (role.equalsIgnoreCase("trainee")) {
 					try {
@@ -116,6 +117,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		        	}
 				} else { 
 					handlerExceptionResolver.resolveException(request, response, null, new Exception("NOOOO"));
+					return;
+				}
+			} else if (request.getRequestURI().startsWith("/verify/school/contractor-to-trainee")) {
+				try {
+					logger.info("JwtRequestFilter: use SchoolDetailsService (school verify)");
+					userDetails = jwtSchoolDetailsService.loadUserByUsername(username);
+				} catch (Exception ex) {
+					handlerExceptionResolver.resolveException(request, response, null, ex);
 					return;
 				}
 			}
