@@ -3,12 +3,15 @@ package com.idea.recon.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.enums.Grade;
@@ -41,6 +44,9 @@ public class Report {
 	private Integer traineeLinkId;
 	private Boolean isFinalized;
 	private LocalDateTime finalizedAt;
+
+	@OneToOne(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Retort retort;
 	/*
 	 * title VARCHAR(50),
 	description VARCHAR(255),
