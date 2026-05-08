@@ -31,4 +31,29 @@ public class VerificationController {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(verificationService.route(byEmail, forEmail, token), HttpStatus.OK);
 	}
+
+	/**
+	 * Same payload as {@link #verifyContractorTraineeRelationship} but only callable with a trainee JWT.
+	 * Used by downstream services (e.g. report-service) that must enforce junior-only actions.
+	 */
+	@GetMapping(value = "/trainee/contractor-to-trainee")
+	@PreAuthorize("hasAuthority('trainee')")
+	ResponseEntity<RelationshipVerificationDTO> verifyContractorTraineeRelationshipAsTraineeOnly(
+			@RequestParam(value = "by") String byEmail,
+			@RequestParam(value = "for") String forEmail,
+			@RequestHeader(name = "Authorization") String token) throws Exception {
+		logger.info("trainee-only verify: by={}, for={}", byEmail, forEmail);
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(verificationService.route(byEmail, forEmail, token), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/school/contractor-to-trainee")
+	@PreAuthorize("hasAuthority('school')")
+	ResponseEntity<RelationshipVerificationDTO> verifySchoolTraineeContractor(
+			@RequestParam(value = "by") String byEmail,
+			@RequestParam(value = "for") String forEmail,
+			@RequestHeader(name = "Authorization") String token) throws Exception {
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(verificationService.routeSchool(byEmail, forEmail, token), HttpStatus.OK);
+	}
 }
