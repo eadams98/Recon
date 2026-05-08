@@ -71,7 +71,7 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public ReportDTO getSchoolVisibleReport(String byEmail, String forEmail, String token, LocalDate startOfWeek, LocalDate endOfWeek) throws ReportException, Exception {
-		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
+		ResponseEntity<RelationshipVerificationDTO> response = verifyTraineeIdentity(token, byEmail, forEmail);
 		RelationshipVerificationDTO relationship = response.getBody();
 		validateWeekDateParams(startOfWeek, endOfWeek);
 
@@ -413,6 +413,7 @@ public class ReportServiceImpl implements ReportService {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
 			logger.info("school verify error: " + ex.getClass());
 		}
+		ensureVerificationResponse(response, "school");
 		return response;
 	}
 
@@ -432,7 +433,17 @@ public class ReportServiceImpl implements ReportService {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
 			logger.info("trainee verify error: " + ex.getClass());
 		}
+		ensureVerificationResponse(response, "trainee");
 		return response;
+	}
+
+	private static void ensureVerificationResponse(
+			ResponseEntity<RelationshipVerificationDTO> response, String verificationType) throws MicroserviceException {
+		if (response == null || response.getBody() == null) {
+			throw new MicroserviceException(
+					"User-service " + verificationType + " verification unavailable",
+					org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE);
+		}
 	}
 
     private ResponseEntity<RelationshipVerificationDTO> verifyIdentity(String token, String sentByEmail, String sentForEmail) throws MicroserviceException {
