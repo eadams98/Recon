@@ -29,7 +29,7 @@ public class TraineeController {
 	@GetMapping("/get-contractors")
 	ResponseEntity<List<String>> getMyContractorsWhoHaveReports(@RequestParam(value = "by") String byEmail, @RequestParam(value = "for") String forEmail, @RequestParam(value = "year") Integer year, @RequestParam(value = "month") String month, @RequestHeader (name="Authorization") String token) throws ReportException, Exception{
 		token = token.split(" ")[1];
-		return new ResponseEntity<>(reportService.getWeeksContainingReports(byEmail, forEmail, token, year, month), HttpStatus.OK);
+		return new ResponseEntity<>(reportService.getWeeksContainingReports(byEmail, forEmail, token, year, month, true), HttpStatus.OK);
 	}
 	
 }
