@@ -1,9 +1,11 @@
 package com.idea.recon.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.exception.ReportException;
 import com.idea.recon.service.ReportService;
 
@@ -30,6 +33,17 @@ public class TraineeController {
 	ResponseEntity<List<String>> getMyContractorsWhoHaveReports(@RequestParam(value = "by") String byEmail, @RequestParam(value = "for") String forEmail, @RequestParam(value = "year") Integer year, @RequestParam(value = "month") String month, @RequestHeader (name="Authorization") String token) throws ReportException, Exception{
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(reportService.getWeeksContainingReports(byEmail, forEmail, token, year, month, true), HttpStatus.OK);
+	}
+
+	@GetMapping("/get-report")
+	ResponseEntity<ReportDTO> getSchoolVisibleReport(
+			@RequestParam(value = "by") String byEmail,
+			@RequestParam(value = "for") String forEmail,
+			@RequestParam(value = "weekStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStartDate,
+			@RequestParam(value = "weekEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekEndDate,
+			@RequestHeader(name = "Authorization") String token) throws ReportException, Exception {
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(reportService.getSchoolVisibleReport(byEmail, forEmail, token, weekStartDate, weekEndDate), HttpStatus.OK);
 	}
 	
 }
