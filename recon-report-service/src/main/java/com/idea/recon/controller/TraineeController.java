@@ -10,11 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.idea.recon.dto.CreateRetortDTO;
 import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.exception.ReportException;
 import com.idea.recon.service.ReportService;
@@ -44,6 +47,14 @@ public class TraineeController {
 			@RequestHeader(name = "Authorization") String token) throws ReportException, Exception {
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(reportService.getSchoolVisibleReport(byEmail, forEmail, token, weekStartDate, weekEndDate), HttpStatus.OK);
+	}
+
+	@PostMapping("/create-retort")
+	ResponseEntity<ReportDTO> createTraineeRetort(
+			@RequestBody CreateRetortDTO dto,
+			@RequestHeader(name = "Authorization") String token) throws ReportException, Exception {
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(reportService.createTraineeRetort(dto, token), HttpStatus.CREATED);
 	}
 	
 }

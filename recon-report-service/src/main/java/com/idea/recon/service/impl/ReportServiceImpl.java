@@ -1,8 +1,8 @@
 package com.idea.recon.service.impl;
 
-import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,25 +17,21 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idea.recon.dto.ContractorAndTraineeCorrespondenceDTO;
+import com.idea.recon.dto.CreateRetortDTO;
 import com.idea.recon.dto.RelationshipVerificationDTO;
 import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.entity.Report;
+import com.idea.recon.entity.Retort;
 import com.idea.recon.enums.Grade;
 import com.idea.recon.exception.MicroserviceException;
 import com.idea.recon.exception.ReportException;
 import com.idea.recon.repository.ReportRepository;
+import com.idea.recon.repository.RetortRepository;
 import com.idea.recon.service.ReportService;
-import com.idea.recon.utility.ErrorInfo;
 import com.idea.recon.utility.MicroserviceUtil;
 
 
@@ -52,6 +48,9 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Autowired
 	ReportRepository reportRepository;
+
+	@Autowired
+	RetortRepository retortRepository;
 	
 	@Override
 	public ReportDTO getReport(String byEmail, String forEmail, String token, LocalDate startOfWeek, LocalDate endOfWeek) throws ReportException, Exception {
@@ -97,11 +96,14 @@ public class ReportServiceImpl implements ReportService {
 	private static ReportDTO toReadReportDto(Report report) {
 		String rebuttal = report.getRebuttal() == null ? "" : report.getRebuttal();
 		String title = report.getTitle() == null ? "" : report.getTitle();
+		Retort retort = report.getRetort();
+		String retortContent = retort != null ? retort.getContent() : null;
 		return ReportDTO.builder()
 				.reportId(report.getReportId())
 				.description(report.getDescription())
 				.grade(Grade.toString(report.getGrade()))
 				.rebuttal(rebuttal)
+				.retortContent(retortContent)
 				.submissionDate(report.getSubmissionDate())
 				.weekStartDate(report.getWeekStartDate())
 				.weekEndDate(report.getWeekEndDate())
@@ -246,7 +248,142 @@ public class ReportServiceImpl implements ReportService {
 		return reportRepository.getWeeksWithReportsOfContractorWithTrainee(
 				relationship.getById(), relationship.getForId(), year, monthInt);
 	}
-	
+
+	@Override
+	@Transactional
+	public ReportDTO finalizeReport(String byEmail, String forEmail, String token, LocalDate weekStart, LocalDate weekEnd)
+			throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+		validateWeekDateParams(weekStart, weekEnd);
+
+		Optional<Report> optionalReport =
+				reportRepository.getSpecificReport(relationship.getById(), relationship.getForId(), weekStart, weekEnd);
+		if (optionalReport.isEmpty()) {
+			throw new ReportException("Report.NOT_FOUND");
+		}
+		Report report = optionalReport.get();
+		if (Boolean.TRUE.equals(report.getIsFinalized())) {
+			return toReadReportDto(report);
+		}
+		report.setIsFinalized(true);
+		report.setFinalizedAt(LocalDateTime.now());
+		report = reportRepository.save(report);
+		return toReadReportDto(report);
+	}
+
+	@Override
+	@Transactional
+	public ReportDTO createTraineeRetort(CreateRetortDTO dto, String token) throws ReportException, Exception {
+		if (dto.getContent() == null || dto.getContent().isBlank()) {
+			throw new ReportException("Report.RETORT_CONTENT_REQUIRED");
+		}
+		ResponseEntity<RelationshipVerificationDTO> response =
+				verifyTraineeIdentity(token, dto.getSentByEmail(), dto.getSentForEmail());
+		RelationshipVerificationDTO relationship = response.getBody();
+
+		LocalDate startOfWeek = dto.getWeekStartDate() != null ? getStartOfWeek(dto.getWeekStartDate()) : getStartOfWeek(LocalDate.now());
+		LocalDate endOfWeek = dto.getWeekEndDate() != null ? getEndOfWeek(dto.getWeekEndDate()) : getEndOfWeek(LocalDate.now());
+		validateWeekDateParams(startOfWeek, endOfWeek);
+
+		Report report = reportRepository
+				.getSpecificReport(relationship.getById(), relationship.getForId(), startOfWeek, endOfWeek)
+				.orElseThrow(() -> new ReportException("Report.NOT_FOUND"));
+
+		if (!Boolean.TRUE.equals(report.getIsFinalized())) {
+			throw new ReportException("Report.NOT_FINALIZED");
+		}
+		if (retortRepository.findByReport_ReportId(report.getReportId()).isPresent()) {
+			throw new ReportException("Report.RETORT_EXISTS");
+		}
+
+		Retort retort = Retort.builder()
+				.traineeAuthorId(relationship.getForId())
+				.content(dto.getContent().trim())
+				.createdAt(LocalDateTime.now())
+				.report(report)
+				.build();
+		retortRepository.save(retort);
+
+		return toReadReportDto(reportRepository.findById(report.getReportId()).orElseThrow());
+	}
+
+	@Override
+	public ReportDTO getSchoolPortalReport(String byEmail, String forEmail, String token, LocalDate startOfWeek, LocalDate endOfWeek)
+			throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifySchoolIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+		validateWeekDateParams(startOfWeek, endOfWeek);
+
+		Optional<Report> optionalReport = reportRepository.getSchoolVisibleSpecificReport(
+				relationship.getById(), relationship.getForId(), startOfWeek, endOfWeek);
+
+		if (optionalReport.isEmpty())
+			throw new Exception("No Report found for given date range: " + startOfWeek + " - " + endOfWeek);
+
+		return toReadReportDto(optionalReport.get());
+	}
+
+	@Override
+	public List<String> getSchoolPortalYearsContainingReports(String byEmail, String forEmail, String token)
+			throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifySchoolIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+		return reportRepository.getSchoolVisibleYearsWithReportsOfContractorWithTrainee(
+				relationship.getById(), relationship.getForId());
+	}
+
+	@Override
+	public List<String> getSchoolPortalMonthsContainingReports(String byEmail, String forEmail, String token, Integer year)
+			throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifySchoolIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+		return reportRepository.getSchoolVisibleMonthsWithReportsOfContractorWithTrainee(
+				relationship.getById(), relationship.getForId(), year);
+	}
+
+	@Override
+	public List<String> getSchoolPortalWeeksContainingReports(String byEmail, String forEmail, String token, Integer year,
+			String month) throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifySchoolIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+
+		Map<String, Integer> monthStringToMonthInteger = new HashMap<>();
+		monthStringToMonthInteger.put("january", 1);
+		monthStringToMonthInteger.put("jan", 1);
+		monthStringToMonthInteger.put("february", 2);
+		monthStringToMonthInteger.put("feb", 2);
+		monthStringToMonthInteger.put("march", 3);
+		monthStringToMonthInteger.put("mar", 3);
+		monthStringToMonthInteger.put("april", 4);
+		monthStringToMonthInteger.put("apr", 4);
+		monthStringToMonthInteger.put("may", 5);
+		monthStringToMonthInteger.put("june", 6);
+		monthStringToMonthInteger.put("jun", 6);
+		monthStringToMonthInteger.put("july", 7);
+		monthStringToMonthInteger.put("jul", 7);
+		monthStringToMonthInteger.put("august", 8);
+		monthStringToMonthInteger.put("aug", 8);
+		monthStringToMonthInteger.put("september", 9);
+		monthStringToMonthInteger.put("sep", 9);
+		monthStringToMonthInteger.put("october", 10);
+		monthStringToMonthInteger.put("oct", 10);
+		monthStringToMonthInteger.put("november", 11);
+		monthStringToMonthInteger.put("nov", 11);
+		monthStringToMonthInteger.put("december", 12);
+		monthStringToMonthInteger.put("dec", 12);
+
+		int monthInt;
+		month = month.toLowerCase();
+		if (monthStringToMonthInteger.containsKey(month))
+			monthInt = monthStringToMonthInteger.get(month);
+		else
+			monthInt = Integer.valueOf(month);
+
+		return reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(
+				relationship.getById(), relationship.getForId(), year, monthInt);
+	}
+
 	// PRIVATE METHDOS 
 	private static LocalDate getStartOfWeek(LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
@@ -260,6 +397,44 @@ public class ReportServiceImpl implements ReportService {
         return date.plusDays(daysToAdd);
     }
     
+	private ResponseEntity<RelationshipVerificationDTO> verifySchoolIdentity(
+			String token, String contractorEmail, String traineeEmail) throws MicroserviceException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + token);
+
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		String url =
+				"http://user-service/verify/school/contractor-to-trainee?by=" + contractorEmail + "&for=" + traineeEmail;
+		ResponseEntity<RelationshipVerificationDTO> response = null;
+		try {
+			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			logger.info("school verify: " + response.getBody());
+		} catch (Exception ex) {
+			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
+			logger.info("school verify error: " + ex.getClass());
+		}
+		return response;
+	}
+
+	private ResponseEntity<RelationshipVerificationDTO> verifyTraineeIdentity(
+			String token, String contractorEmail, String traineeEmail) throws MicroserviceException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + token);
+
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+		String url =
+				"http://user-service/verify/trainee/contractor-to-trainee?by=" + contractorEmail + "&for=" + traineeEmail;
+		ResponseEntity<RelationshipVerificationDTO> response = null;
+		try {
+			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			logger.info("trainee verify: " + response.getBody());
+		} catch (Exception ex) {
+			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
+			logger.info("trainee verify error: " + ex.getClass());
+		}
+		return response;
+	}
+
     private ResponseEntity<RelationshipVerificationDTO> verifyIdentity(String token, String sentByEmail, String sentForEmail) throws MicroserviceException {
     	HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", "Bearer " + token);

@@ -17,6 +17,8 @@ public class ReportDTO {
 	private String title;
 	private String description;
 	private String rebuttal;
+	/** Text from the optional {@code Retort} entity (distinct from legacy {@code rebuttal}). */
+	private String retortContent;
 	private String grade;
 	private LocalDate submissionDate; // ALWAYS GOTTEN FROM BACKEND
 	private LocalDate weekStartDate; // Start and End can be gotten from a single given date.
