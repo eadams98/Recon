@@ -67,6 +67,8 @@ class ReportRetortVisibilityIntegrationTest {
 		assertThat(contractorWeeks).isNotEmpty();
 		assertThat(schoolWeeks).isEmpty();
 
+		assertThat(reportRepository.getSpecificReport(contractorId, traineeId, weekStart, weekEnd)).isPresent();
+		assertThat(reportRepository.getSchoolVisibleSpecificReport(contractorId, traineeId, weekStart, weekEnd)).isEmpty();
 		draft.setIsFinalized(true);
 		draft.setFinalizedAt(LocalDateTime.of(2026, 6, 7, 9, 0));
 		reportRepository.saveAndFlush(draft);
@@ -74,6 +76,12 @@ class ReportRetortVisibilityIntegrationTest {
 		schoolWeeks = reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(contractorId, traineeId, year, month);
 		assertThat(schoolWeeks).containsExactlyInAnyOrderElementsOf(contractorWeeks);
 
+		assertThat(reportRepository.getSchoolVisibleSpecificReport(contractorId, traineeId, weekStart, weekEnd))
+				.isPresent()
+				.hasValueSatisfying(r -> {
+					assertThat(r.getReportId()).isEqualTo(draft.getReportId());
+					assertThat(r.getIsFinalized()).isTrue();
+				});
 		Report finalized = reportRepository.findById(draft.getReportId()).orElseThrow();
 
 		retortRepository.save(Retort.builder()

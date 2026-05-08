@@ -57,24 +57,46 @@ public class ReportServiceImpl implements ReportService {
 	public ReportDTO getReport(String byEmail, String forEmail, String token, LocalDate startOfWeek, LocalDate endOfWeek) throws ReportException, Exception {
 		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
 		RelationshipVerificationDTO relationship = response.getBody();
-		
-		String regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}";
-		
-		if (!Pattern.matches(regex, startOfWeek.toString()) || !Pattern.matches(regex, endOfWeek.toString()))
-			throw new Exception("incorrect start or end date");
-		
+		validateWeekDateParams(startOfWeek, endOfWeek);
+
 		Optional<Report> optionalReport = reportRepository.getSpecificReport(relationship.getById(), relationship.getForId(), startOfWeek, endOfWeek);
 		logger.info(optionalReport.toString());
-		
+
 		if (optionalReport.isEmpty())
 			throw new Exception("No Report found for given date range: " + startOfWeek + " - " + endOfWeek);
-		
+
 		Report report = optionalReport.get();
-		logger.info(report.toString()); 
-		
+		logger.info(report.toString());
+		return toReadReportDto(report);
+	}
+
+	@Override
+	public ReportDTO getSchoolVisibleReport(String byEmail, String forEmail, String token, LocalDate startOfWeek, LocalDate endOfWeek) throws ReportException, Exception {
+		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
+		RelationshipVerificationDTO relationship = response.getBody();
+		validateWeekDateParams(startOfWeek, endOfWeek);
+
+		Optional<Report> optionalReport = reportRepository.getSchoolVisibleSpecificReport(
+				relationship.getById(), relationship.getForId(), startOfWeek, endOfWeek);
+		logger.info(optionalReport.toString());
+
+		if (optionalReport.isEmpty())
+			throw new Exception("No Report found for given date range: " + startOfWeek + " - " + endOfWeek);
+
+		Report report = optionalReport.get();
+		logger.info(report.toString());
+		return toReadReportDto(report);
+	}
+
+	private static void validateWeekDateParams(LocalDate startOfWeek, LocalDate endOfWeek) throws Exception {
+		String regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}";
+		if (!Pattern.matches(regex, startOfWeek.toString()) || !Pattern.matches(regex, endOfWeek.toString()))
+			throw new Exception("incorrect start or end date");
+	}
+
+	private static ReportDTO toReadReportDto(Report report) {
 		String rebuttal = report.getRebuttal() == null ? "" : report.getRebuttal();
 		String title = report.getTitle() == null ? "" : report.getTitle();
-		
 		return ReportDTO.builder()
 				.reportId(report.getReportId())
 				.description(report.getDescription())
@@ -85,7 +107,6 @@ public class ReportServiceImpl implements ReportService {
 				.weekEndDate(report.getWeekEndDate())
 				.isFinalized(report.getIsFinalized())
 				.finalizedAt(report.getFinalizedAt())
-				//.sentForEmail(forEmail)
 				.title(title)
 				.build();
 	}
