@@ -67,7 +67,7 @@ public class ContractorController {
 	@PreAuthorize("hasAuthority('contractor')")
 	ResponseEntity<String> updateMyDetails(@RequestBody ContractorDTO updateInfo, @PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
-		updateInfo.setId(id);
+		updateInfo.setId(id); // either add id to object in front or add id param to service method
 		return new ResponseEntity<>(contractorService.updateMyDetails(updateInfo, token), HttpStatus.OK);
 	}
 	
