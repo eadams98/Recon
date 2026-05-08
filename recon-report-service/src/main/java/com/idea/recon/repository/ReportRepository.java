@@ -47,6 +47,16 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year AND MONTH(week_start_date) = :month"
 	)
 	List<String> getWeeksWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year, Integer month);
+
+	/**
+	 * Same as {@link #getWeeksWithReportsOfContractorWithTrainee} but only weeks the school / trainee
+	 * may see ({@code is_finalized = true}).
+	 */
+	@Query("SELECT CONCAT(week_start_date, ' - ',  week_end_date) AS weekly_report FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year AND MONTH(week_start_date) = :month "
+			+ "AND is_finalized = true"
+	)
+	List<String> getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year, Integer month);
 	
 }
 

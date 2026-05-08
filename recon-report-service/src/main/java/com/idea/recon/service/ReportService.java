@@ -19,4 +19,10 @@ public interface ReportService {
 	public List<String> getMonthsContainingReports(String byEmail, String forEmail, String token, Integer year) throws ReportException, Exception;
 	public List<String> getWeeksContainingReports(String byEmail, String forEmail, String token, Integer year, String month) throws ReportException, Exception;
 
+	/**
+	 * @param finalizedOnly when true, only weeks with a finalized report are returned (school / trainee listings).
+	 *        When false, all saved reports for that relationship are included (contractor tooling).
+	 */
+	public List<String> getWeeksContainingReports(String byEmail, String forEmail, String token, Integer year, String month, boolean finalizedOnly) throws ReportException, Exception;
+
 }
