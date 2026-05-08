@@ -13,7 +13,9 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -34,6 +36,8 @@ public class Retort {
 
 	private LocalDateTime createdAt;
 
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	@OneToOne(optional = false)
 	@JoinColumn(name = "report_id", unique = true, nullable = false)
 	private Report report;
