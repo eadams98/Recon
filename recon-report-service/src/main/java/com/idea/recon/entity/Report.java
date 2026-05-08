@@ -1,6 +1,7 @@
 package com.idea.recon.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,6 +39,8 @@ public class Report {
 	
 	private Integer contractorLinkId;
 	private Integer traineeLinkId;
+	private Boolean isFinalized;
+	private LocalDateTime finalizedAt;
 	/*
 	 * title VARCHAR(50),
 	description VARCHAR(255),
@@ -65,6 +68,8 @@ public class Report {
 				.submissionDate(submissionDate)
 				.weekStartDate(weekStartDate)
 				.weekEndDate(weekEndDate)
+				.isFinalized(isFinalized)
+				.finalizedAt(finalizedAt)
 				.sentByEmail(sentBy)
 				.sentForEmail(sentFor)
 				.build();
