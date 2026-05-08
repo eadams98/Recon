@@ -19,7 +19,9 @@ import com.idea.recon.enums.Grade;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -45,6 +47,8 @@ public class Report {
 	private Boolean isFinalized;
 	private LocalDateTime finalizedAt;
 
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	@OneToOne(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Retort retort;
 	/*
