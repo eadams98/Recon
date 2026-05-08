@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,61 @@ class ReportRetortVisibilityIntegrationTest {
 
 	@Autowired
 	private RetortRepository retortRepository;
+
+	@Test
+	void contractorDraft_schoolListingExcludesUntilFinalized_juniorCanAddRetort() {
+		Integer contractorId = 301;
+		Integer traineeId = 401;
+		LocalDate weekStart = LocalDate.of(2026, 6, 1);
+		LocalDate weekEnd = LocalDate.of(2026, 6, 7);
+
+		Report draft = reportRepository.save(Report.builder()
+				.title("Draft weekly")
+				.description("Saved by contractor")
+				.grade(Grade.B)
+				.submissionDate(LocalDate.of(2026, 6, 7))
+				.weekStartDate(weekStart)
+				.weekEndDate(weekEnd)
+				.contractorLinkId(contractorId)
+				.traineeLinkId(traineeId)
+				.isFinalized(false)
+				.finalizedAt(null)
+				.build());
+
+		assertThat(draft.getReportId()).isNotNull();
+		assertThat(draft.getIsFinalized()).isFalse();
+
+		int year = 2026;
+		int month = 6;
+
+		List<String> contractorWeeks =
+				reportRepository.getWeeksWithReportsOfContractorWithTrainee(contractorId, traineeId, year, month);
+		List<String> schoolWeeks =
+				reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(contractorId, traineeId, year, month);
+
+		assertThat(contractorWeeks).isNotEmpty();
+		assertThat(schoolWeeks).isEmpty();
+
+		draft.setIsFinalized(true);
+		draft.setFinalizedAt(LocalDateTime.of(2026, 6, 7, 9, 0));
+		reportRepository.saveAndFlush(draft);
+
+		schoolWeeks = reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(contractorId, traineeId, year, month);
+		assertThat(schoolWeeks).containsExactlyInAnyOrderElementsOf(contractorWeeks);
+
+		Report finalized = reportRepository.findById(draft.getReportId()).orElseThrow();
+
+		retortRepository.save(Retort.builder()
+				.traineeAuthorId(902)
+				.content("Junior retort after finalize")
+				.createdAt(LocalDateTime.of(2026, 6, 7, 10, 30))
+				.report(finalized)
+				.build());
+		retortRepository.flush();
+
+		assertThat(retortRepository.findByReport_ReportId(finalized.getReportId()))
+				.hasValueSatisfying(r -> assertThat(r.getContent()).isEqualTo("Junior retort after finalize"));
+	}
 
 	@Test
 	void reportAllowsAtMostOneRetort_enforcedByDatabase() {

@@ -177,6 +177,12 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public List<String> getWeeksContainingReports(String byEmail, String forEmail, String token, Integer year,
 			String month) throws ReportException, Exception {
+		return getWeeksContainingReports(byEmail, forEmail, token, year, month, false);
+	}
+
+	@Override
+	public List<String> getWeeksContainingReports(String byEmail, String forEmail, String token, Integer year,
+			String month, boolean finalizedOnly) throws ReportException, Exception {
 		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
 		RelationshipVerificationDTO relationship = response.getBody();
 		
@@ -212,7 +218,12 @@ public class ReportServiceImpl implements ReportService {
 		else
 			monthInt = Integer.valueOf(month);
 		
-		return reportRepository.getWeeksWithReportsOfContractorWithTrainee(relationship.getById(), relationship.getForId(), year, monthInt);
+		if (finalizedOnly) {
+			return reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(
+					relationship.getById(), relationship.getForId(), year, monthInt);
+		}
+		return reportRepository.getWeeksWithReportsOfContractorWithTrainee(
+				relationship.getById(), relationship.getForId(), year, monthInt);
 	}
 	
 	// PRIVATE METHDOS 
