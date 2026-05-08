@@ -46,11 +46,22 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId " +
 			"GROUP BY YEAR(week_start_date)")
 	List<String> getYearsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId);
+
+	@Query("SELECT YEAR(week_start_date) AS year FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND is_finalized = true " +
+			"GROUP BY YEAR(week_start_date)")
+	List<String> getSchoolVisibleYearsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId);
 	
 	@Query("SELECT DATE_FORMAT(week_start_date, '%M') AS month FROM Report " +
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year " +
 			"GROUP BY month")
 	List<String> getMonthsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year);
+
+	@Query("SELECT DATE_FORMAT(week_start_date, '%M') AS month FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year "
+			+ "AND is_finalized = true "
+			+ "GROUP BY month")
+	List<String> getSchoolVisibleMonthsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year);
 	
 	@Query("SELECT CONCAT(week_start_date, ' - ',  week_end_date) AS weekly_report FROM Report " +
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year AND MONTH(week_start_date) = :month"
