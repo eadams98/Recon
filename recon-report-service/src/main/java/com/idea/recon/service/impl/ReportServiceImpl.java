@@ -83,6 +83,8 @@ public class ReportServiceImpl implements ReportService {
 				.submissionDate(report.getSubmissionDate())
 				.weekStartDate(report.getWeekStartDate())
 				.weekEndDate(report.getWeekEndDate())
+				.isFinalized(report.getIsFinalized())
+				.finalizedAt(report.getFinalizedAt())
 				//.sentForEmail(forEmail)
 				.title(title)
 				.build();
@@ -117,6 +119,8 @@ public class ReportServiceImpl implements ReportService {
 				.submissionDate(report.getSubmissionDate())
 				.weekStartDate(report.getWeekStartDate())
 				.weekEndDate(report.getWeekEndDate())
+				.isFinalized(report.getIsFinalized())
+				.finalizedAt(report.getFinalizedAt())
 				//.sentForEmail(forEmail)
 				.title(report.getTitle())
 				.build();
@@ -143,6 +147,8 @@ public class ReportServiceImpl implements ReportService {
 				.weekEndDate(endOfWeek)
 				.contractorLinkId(response.getBody().getById())
 				.traineeLinkId(response.getBody().getForId())
+				.isFinalized(false)
+				.finalizedAt(null)
 				.build();
 		
 		report = reportRepository.save(report);
