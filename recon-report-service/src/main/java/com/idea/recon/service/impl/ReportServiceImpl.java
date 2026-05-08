@@ -208,38 +208,7 @@ public class ReportServiceImpl implements ReportService {
 			String month, boolean finalizedOnly) throws ReportException, Exception {
 		ResponseEntity<RelationshipVerificationDTO> response = verifyIdentity(token, byEmail, forEmail);
 		RelationshipVerificationDTO relationship = response.getBody();
-		
-		Map<String, Integer> monthStringToMonthInteger = new HashMap<>();
-		monthStringToMonthInteger.put("january", 1);
-		monthStringToMonthInteger.put("jan", 1);
-		monthStringToMonthInteger.put("february", 2);
-		monthStringToMonthInteger.put("feb", 2);
-		monthStringToMonthInteger.put("march", 3);
-		monthStringToMonthInteger.put("mar", 3);
-		monthStringToMonthInteger.put("april", 4);
-		monthStringToMonthInteger.put("apr", 4);
-		monthStringToMonthInteger.put("may", 5);
-		monthStringToMonthInteger.put("june", 6);
-		monthStringToMonthInteger.put("jun", 6);
-		monthStringToMonthInteger.put("july", 7);
-		monthStringToMonthInteger.put("jul", 7);
-		monthStringToMonthInteger.put("august", 8);
-		monthStringToMonthInteger.put("aug", 8);
-		monthStringToMonthInteger.put("september", 9);
-		monthStringToMonthInteger.put("sep", 9);
-		monthStringToMonthInteger.put("october", 10);
-		monthStringToMonthInteger.put("oct", 10);
-		monthStringToMonthInteger.put("november", 11);
-		monthStringToMonthInteger.put("nov", 11);
-		monthStringToMonthInteger.put("december", 12);
-		monthStringToMonthInteger.put("dec", 12);
-		
-		int monthInt;
-		month = month.toLowerCase();
-		if (monthStringToMonthInteger.containsKey(month))
-			monthInt = monthStringToMonthInteger.get(month);
-		else
-			monthInt = Integer.valueOf(month);
+		int monthInt = parseMonthToInt(month);
 		
 		if (finalizedOnly) {
 			return reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(
@@ -347,38 +316,7 @@ public class ReportServiceImpl implements ReportService {
 			String month) throws ReportException, Exception {
 		ResponseEntity<RelationshipVerificationDTO> response = verifySchoolIdentity(token, byEmail, forEmail);
 		RelationshipVerificationDTO relationship = response.getBody();
-
-		Map<String, Integer> monthStringToMonthInteger = new HashMap<>();
-		monthStringToMonthInteger.put("january", 1);
-		monthStringToMonthInteger.put("jan", 1);
-		monthStringToMonthInteger.put("february", 2);
-		monthStringToMonthInteger.put("feb", 2);
-		monthStringToMonthInteger.put("march", 3);
-		monthStringToMonthInteger.put("mar", 3);
-		monthStringToMonthInteger.put("april", 4);
-		monthStringToMonthInteger.put("apr", 4);
-		monthStringToMonthInteger.put("may", 5);
-		monthStringToMonthInteger.put("june", 6);
-		monthStringToMonthInteger.put("jun", 6);
-		monthStringToMonthInteger.put("july", 7);
-		monthStringToMonthInteger.put("jul", 7);
-		monthStringToMonthInteger.put("august", 8);
-		monthStringToMonthInteger.put("aug", 8);
-		monthStringToMonthInteger.put("september", 9);
-		monthStringToMonthInteger.put("sep", 9);
-		monthStringToMonthInteger.put("october", 10);
-		monthStringToMonthInteger.put("oct", 10);
-		monthStringToMonthInteger.put("november", 11);
-		monthStringToMonthInteger.put("nov", 11);
-		monthStringToMonthInteger.put("december", 12);
-		monthStringToMonthInteger.put("dec", 12);
-
-		int monthInt;
-		month = month.toLowerCase();
-		if (monthStringToMonthInteger.containsKey(month))
-			monthInt = monthStringToMonthInteger.get(month);
-		else
-			monthInt = Integer.valueOf(month);
+		int monthInt = parseMonthToInt(month);
 
 		return reportRepository.getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(
 				relationship.getById(), relationship.getForId(), year, monthInt);
@@ -444,6 +382,39 @@ public class ReportServiceImpl implements ReportService {
 					"User-service " + verificationType + " verification unavailable",
 					org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE);
 		}
+	}
+
+	private static int parseMonthToInt(String month) {
+		Map<String, Integer> monthStringToMonthInteger = new HashMap<>();
+		monthStringToMonthInteger.put("january", 1);
+		monthStringToMonthInteger.put("jan", 1);
+		monthStringToMonthInteger.put("february", 2);
+		monthStringToMonthInteger.put("feb", 2);
+		monthStringToMonthInteger.put("march", 3);
+		monthStringToMonthInteger.put("mar", 3);
+		monthStringToMonthInteger.put("april", 4);
+		monthStringToMonthInteger.put("apr", 4);
+		monthStringToMonthInteger.put("may", 5);
+		monthStringToMonthInteger.put("june", 6);
+		monthStringToMonthInteger.put("jun", 6);
+		monthStringToMonthInteger.put("july", 7);
+		monthStringToMonthInteger.put("jul", 7);
+		monthStringToMonthInteger.put("august", 8);
+		monthStringToMonthInteger.put("aug", 8);
+		monthStringToMonthInteger.put("september", 9);
+		monthStringToMonthInteger.put("sep", 9);
+		monthStringToMonthInteger.put("october", 10);
+		monthStringToMonthInteger.put("oct", 10);
+		monthStringToMonthInteger.put("november", 11);
+		monthStringToMonthInteger.put("nov", 11);
+		monthStringToMonthInteger.put("december", 12);
+		monthStringToMonthInteger.put("dec", 12);
+
+		String normalizedMonth = month.toLowerCase();
+		if (monthStringToMonthInteger.containsKey(normalizedMonth)) {
+			return monthStringToMonthInteger.get(normalizedMonth);
+		}
+		return Integer.valueOf(normalizedMonth);
 	}
 
     private ResponseEntity<RelationshipVerificationDTO> verifyIdentity(String token, String sentByEmail, String sentForEmail) throws MicroserviceException {
