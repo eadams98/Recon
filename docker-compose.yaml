@@ -5,7 +5,7 @@ services:
     env_file:
       - ./env/mysql.env
     volumes:
-      - /Users/repoleved/Desktop/docker/recon-mysql:/var/lib/mysql
+      - recon-mysql-data:/var/lib/mysql
   eureka:
     build: 
       context: ./recon-discovery-service
@@ -48,3 +48,5 @@ services:
       - eureka
       - mysql
 
+volumes:
+  recon-mysql-data:
