@@ -18,9 +18,11 @@ logging:
     '[com.recon.discoveryServer': debug
     root: INFO
 
-#Setup Actuator port and exposed all actuator endpoints
-#managment:
-# endpoints:
-#   web:
-#     exposure:
-#       include: "*"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
