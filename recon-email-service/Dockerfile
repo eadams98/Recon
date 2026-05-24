@@ -1,5 +1,6 @@
 FROM amazoncorretto:17
 
+RUN yum install -y curl && yum clean all
 
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
