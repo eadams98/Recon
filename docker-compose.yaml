@@ -6,6 +6,12 @@ services:
       - ./env/mysql.env
     volumes:
       - /Users/repoleved/Desktop/docker/recon-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
   eureka:
     build: 
       context: ./recon-discovery-service
@@ -14,6 +20,12 @@ services:
       - env/recon-eureka.env
     ports:
       - $RECON_EUREKA_HOST_PORT:$RECON_EUREKA_APP_PORT
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8761/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
   recon-core:
     build:
       context: ./reconV2
@@ -23,8 +35,16 @@ services:
     ports:
       - $RECON_CORE_HOST_PORT:$RECON_CORE_APP_PORT
     depends_on:
-      - eureka
-      - mysql
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4000/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
   recon-reports:
     build:
       context: ./recon-report-service
@@ -34,8 +54,16 @@ services:
     ports:
       - $RECON_REPORT_HOST_PORT:$RECON_REPORT_APP_PORT
     depends_on:
-      - eureka
-      - mysql
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4001/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
   recon-email:
     build:
       context: ./recon-email-service
@@ -45,6 +73,13 @@ services:
     ports:
       - $RECON_EMAIL_HOST_PORT:$RECON_EMAIL_APP_PORT
     depends_on:
-      - eureka
-      - mysql
-
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4003/actuator/health | grep -q UP"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
