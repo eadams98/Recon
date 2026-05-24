@@ -6,6 +6,9 @@ services:
       - ./env/mysql.env
     volumes:
       - recon-mysql-data:/var/lib/mysql
+      - ./reconV2/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./reconV2/src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      - ./docker/mysql/init/03-report-schema-extensions.sql:/docker-entrypoint-initdb.d/03-report-schema-extensions.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s

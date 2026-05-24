@@ -30,6 +30,18 @@ docker compose down
 docker compose -f docker-compose.yaml -f docker-compose.fullstack.yml down
 ```
 
+**Reset database (re-run seed scripts):**
+
+MySQL init scripts run only when the `recon-mysql-data` volume is first created. To wipe and re-seed:
+
+```bash
+docker compose down -v
+docker compose up --build
+# fullstack:
+docker compose -f docker-compose.yaml -f docker-compose.fullstack.yml down -v
+docker compose -f docker-compose.yaml -f docker-compose.fullstack.yml up --build
+```
+
 ## Seeded test users
 
 Password for all: `password`
