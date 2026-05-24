@@ -13,7 +13,9 @@ services:
       - ${RECON_CLIENT_CONTEXT}/src:/app/src
       - ${RECON_CLIENT_CONTEXT}/public:/app/public
     depends_on:
-      - recon-core
-      - recon-reports
+      recon-core:
+        condition: service_healthy
+      recon-reports:
+        condition: service_healthy
     stdin_open: true
     tty: true
