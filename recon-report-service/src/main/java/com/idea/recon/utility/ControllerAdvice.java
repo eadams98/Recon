@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -27,6 +28,16 @@ public class ControllerAdvice {
 		ErrorInfo error = new ErrorInfo();
 		error.setErrorMessage(env.getProperty(exception.getMessage()));
 		error.setErrorCode(HttpStatus.BAD_REQUEST.value()); 
+		error.setTimestamp(LocalDateTime.now());
+		return new ResponseEntity<ErrorInfo>(error, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(value = MissingServletRequestParameterException.class)
+	public ResponseEntity<ErrorInfo> MissingServletRequestParameterExceptionHandler(MissingServletRequestParameterException exception) {
+		logger.error("MissingServletRequestParameterException");
+		ErrorInfo error = new ErrorInfo();
+		error.setErrorMessage(exception.getMessage());
+		error.setErrorCode(HttpStatus.BAD_REQUEST.value());
 		error.setTimestamp(LocalDateTime.now());
 		return new ResponseEntity<ErrorInfo>(error, HttpStatus.BAD_REQUEST);
 	}
