@@ -53,7 +53,6 @@ flowchart TB
   UI -->|REACT_APP_REPORTS_BASE_URL| Reports
   Core --> MySQL
   Reports --> MySQL
-  Email --> MySQL
   Core --> Eureka
   Reports --> Eureka
   Email --> Eureka
@@ -168,6 +167,12 @@ PLAYWRIGHT_SKIP_WEB_SERVER=1 PLAYWRIGHT_BASE_URL=http://localhost:3000 \
 ./mvnw -Dtest=ReportRetortVisibilityIntegrationTest test
 ```
 
+## Architecture Tradeoffs
+
+This project intentionally favors **local development simplicity** over production-grade distributed-system complexity: a shared MySQL database, synchronous service-to-service calls without a retry layer, and Docker Compose scoped to local demos—not a production deployment blueprint.
+
+For an honest breakdown of scope, current architecture, known tradeoffs, and sensible hardening follow-ups, see [docs/architecture-tradeoffs.md](docs/architecture-tradeoffs.md).
+
 ## Engineering decisions
 
 - **Two repositories** — backend portfolio here; UI in `recon-client`, wired by `RECON_CLIENT_CONTEXT` and `docker-compose.fullstack.yml`.
@@ -189,5 +194,6 @@ Documented gaps and follow-ups already in the repo:
 
 ## Related docs
 
+- [docs/architecture-tradeoffs.md](docs/architecture-tradeoffs.md) — scope, architecture, known tradeoffs, production hardening ideas
 - [docs/local-dev-setup.md](docs/local-dev-setup.md) — service map, env files, curl examples
 - [recon-client README](../MERN/Recon/recon-client/README.md) — Node version, `REACT_APP_*`, Playwright visual tests
