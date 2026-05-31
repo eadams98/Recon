@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,8 @@ import com.idea.recon.services.TraineeLoginService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -149,7 +152,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.cors().and().csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/user/authenticate/**", "/register", "/user/test", "/refresh/**", "/bucket/**", "/trainee/unregistered", "/contractor/unregistered-to-school").permitAll()
+				.authorizeRequests().antMatchers("/actuator/**", "/user/authenticate/**", "/register", "/user/test", "/refresh/**", "/bucket/**", "/trainee/unregistered", "/contractor/unregistered-to-school").permitAll()
 				
 				// all other requests need to be authenticated
 					.anyRequest().authenticated().and()
@@ -165,11 +168,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        //configuration.setAllowCredentials(true);
 
+        //logger.info("configuration: " + configuration.getAllowedOrigins());
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

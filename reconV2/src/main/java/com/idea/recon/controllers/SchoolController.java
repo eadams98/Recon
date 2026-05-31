@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.idea.recon.config.JwtTokenUtil;
+import com.idea.recon.dtos.ContractorDTO;
 import com.idea.recon.dtos.SchoolDTO;
 import com.idea.recon.dtos.TraineeDTO;
 import com.idea.recon.services.SchoolService;
@@ -53,8 +54,9 @@ public class SchoolController {
 	
 	@PutMapping(value = "/{id}")
 	@PreAuthorize("hasAuthority('school')")
-	ResponseEntity<String> updateMyDetails(@RequestBody SchoolDTO updateInfo, @RequestHeader (name="Authorization") String token) throws Exception {
+	ResponseEntity<String> updateMyDetails(@RequestBody SchoolDTO updateInfo, @PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
 		token = token.split(" ")[1];
+		updateInfo.setSchoolId(id);
 		return new ResponseEntity<>(schoolService.updateMyDetails(updateInfo, token), HttpStatus.OK);
 	}
 	
@@ -74,6 +76,11 @@ public class SchoolController {
 		return new ResponseEntity<>(schoolService.RegisterContractor(id, contractorEmail, token), HttpStatus.CREATED);
 	}
 	
-	
+	/*@GetMapping(value = "/{id}/contractors")
+	@PreAuthorize("hasAuthority('school')")
+	ResponseEntity<Set<ContractorDTO>> getMyStudents(@PathVariable Integer id, @RequestHeader (name="Authorization") String token) throws Exception {
+		token = token.split(" ")[1];
+		return null;//return new ResponseEntity<>(schoolService.getStudents(id, token), HttpStatus.OK);
+	}*/
 
 }

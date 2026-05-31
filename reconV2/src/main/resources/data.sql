@@ -50,7 +50,7 @@ INSERT school_to_contractor(school_id, contractor_id, date_assigned) VALUES(2, 2
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 1, "1998-05-15");
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 3, "2009-12-01");
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 2, "2012-08-08");
-INSERT tchool_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 4, "2012-08-08");
+INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 4, "2012-08-08");
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 5, "2012-08-08");
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 6, "2012-08-08");
 INSERT school_to_trainee(school_id, trainee_id, date_assigned) VALUES(1, 7, "2012-08-08");

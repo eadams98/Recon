@@ -32,7 +32,7 @@ CREATE TABLE contractor (
     password VARCHAR(100) NOT NULL,
     first_login BOOLEAN DEFAULT 1,
 	PRIMARY KEY (id),
-    FOREIGN KEY (role_id) REFERENCES Role(role_id)
+    FOREIGN KEY (role_id) REFERENCES role(role_id)
 );
 
 CREATE TABLE trainee (
@@ -44,8 +44,8 @@ CREATE TABLE trainee (
 	last_name VARCHAR(20),
     email_id VARCHAR(50) UNIQUE,
 	PRIMARY KEY (trainee_id),
-	FOREIGN KEY (supervisor_id) REFERENCES Contractor(id),
-    FOREIGN KEY (role_id) REFERENCES Role(role_id)
+	FOREIGN KEY (supervisor_id) REFERENCES contractor(id),
+    FOREIGN KEY (role_id) REFERENCES role(role_id)
 );
 
 
@@ -56,11 +56,11 @@ CREATE TABLE school (
 	school_name VARCHAR(255) NOT NULL,
     password VARCHAR(100) NOT NULL,
 	PRIMARY KEY (school_id),
-    FOREIGN KEY (role_id) REFERENCES Role(role_id)
+    FOREIGN KEY (role_id) REFERENCES role(role_id)
 );
 
 DROP TABLE IF EXISTS council;
-CREATE TABLE Council (
+CREATE TABLE council (
 	id iNTEGER NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR(20),
 	last_name VARCHAR(20),
@@ -74,8 +74,8 @@ CREATE TABLE contractor_to_trainee (
 	contractor_id INTEGER NOT NULL,
 	date_assigned Date,
 	PRIMARY KEY(id),
-	FOREIGN KEY (user_id) REFERENCES Trainee(trainee_id),
-	FOREIGN KEY (contractor_id) REFERENCES Contractor(id)
+	FOREIGN KEY (user_id) REFERENCES trainee(trainee_id),
+	FOREIGN KEY (contractor_id) REFERENCES contractor(id)
 );
 
 CREATE TABLE school_to_trainee (
@@ -84,8 +84,8 @@ CREATE TABLE school_to_trainee (
 	trainee_id INTEGER NOT NULL,
 	date_assigned Date,
 	PRIMARY KEY(id),
-	FOREIGN KEY (school_id) REFERENCES School(school_id),
-	FOREIGN KEY (trainee_id) REFERENCES Trainee(trainee_id)
+	FOREIGN KEY (school_id) REFERENCES school(school_id),
+	FOREIGN KEY (trainee_id) REFERENCES trainee(trainee_id)
 );
 
 CREATE TABLE school_to_contractor (
@@ -94,8 +94,8 @@ CREATE TABLE school_to_contractor (
 	contractor_id INTEGER NOT NULL,
 	date_assigned Date,
 	PRIMARY KEY(id),
-	FOREIGN KEY (school_id) REFERENCES School(school_id),
-	FOREIGN KEY (contractor_id) REFERENCES Contractor(id)
+	FOREIGN KEY (school_id) REFERENCES school(school_id),
+	FOREIGN KEY (contractor_id) REFERENCES contractor(id)
 );
 
 DROP TABLE IF EXISTS report;
@@ -111,8 +111,8 @@ CREATE TABLE report (
 	contractor_link_id INTEGER NOT NULL,
     trainee_link_id INTEGER NOT NULL,
 	PRIMARY KEY (report_id),
-	FOREIGN KEY (contractor_link_id) REFERENCES Contractor(id),
-    FOREIGN KEY (trainee_link_id) REFERENCES Trainee(trainee_id)
+	FOREIGN KEY (contractor_link_id) REFERENCES contractor(id),
+    FOREIGN KEY (trainee_link_id) REFERENCES trainee(trainee_id)
 );
 
 
@@ -128,7 +128,7 @@ CREATE TABLE trainee_login (
 	recovery_answer VARCHAR(50),
 	first_login BOOLEAN DEFAULT 1,
 	PRIMARY KEY (login_id),
-	FOREIGN KEY (user_id) REFERENCES Trainee(trainee_id)
+	FOREIGN KEY (user_id) REFERENCES trainee(trainee_id)
 	
 );
 
@@ -138,7 +138,7 @@ CREATE TABLE traineerefreshtoken (
     token VARCHAR(50) UNIQUE NOT NULL,
     expiry_date DATE,
     PRIMARY KEY (id),
-    FOREIGN KEY(trainee_id) REFERENCES Trainee(trainee_id)
+    FOREIGN KEY(trainee_id) REFERENCES trainee(trainee_id)
 );
 
 CREATE TABLE contractor_refresh_token (
@@ -147,7 +147,7 @@ CREATE TABLE contractor_refresh_token (
     token VARCHAR(50) UNIQUE NOT NULL,
     expiry_date DATE,
     PRIMARY KEY (id),
-    FOREIGN KEY(contractor_id) REFERENCES Contractor(id)
+    FOREIGN KEY(contractor_id) REFERENCES contractor(id)
 );
 
 CREATE TABLE school_refresh_token (
@@ -156,5 +156,5 @@ CREATE TABLE school_refresh_token (
     token VARCHAR(50) UNIQUE NOT NULL,
     expiry_date DATE,
     PRIMARY KEY (id),
-    FOREIGN KEY(school_id) REFERENCES School(school_id)
+    FOREIGN KEY(school_id) REFERENCES school(school_id)
 );

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.idea.recon.dto.RelationshipVerificationDTO;
 import com.idea.recon.dto.ReportDTO;
 import com.idea.recon.exception.ReportException;
 import com.idea.recon.service.ReportService;
@@ -34,6 +33,12 @@ public class ContractorController {
 	@Autowired
 	ReportService reportService;
 	
+	@GetMapping("test")
+	ResponseEntity<String> createReport() throws Exception {
+		logger.info("HIT TEST");
+		return new ResponseEntity<>("Hit Report MS", HttpStatus.CREATED);
+	}
+	
 	@PostMapping("/create-report")
 	ResponseEntity<String> createReport(@RequestBody ReportDTO reportDTO, @RequestHeader (name="Authorization") String token) throws Exception {
 		logger.info("HIT CREATE");
@@ -42,8 +47,9 @@ public class ContractorController {
 	}
 	
 	@PutMapping("/update-report")
-	ResponseEntity<ReportDTO> updateReport(@RequestBody ReportDTO reportDTO, @RequestHeader (name="Authorization") String token) throws ReportException, Exception {
+	ResponseEntity<ReportDTO> updateReport(@RequestBody ReportDTO reportDTO, @RequestParam("revision") Boolean isRevision, @RequestHeader (name="Authorization") String token) throws ReportException, Exception {
 		token = token.split(" ")[1];
+		logger.info("isRevision: " + isRevision);
 		return new ResponseEntity<>(reportService.updateReport(reportDTO, token), HttpStatus.OK);
 	}
 	
@@ -69,5 +75,16 @@ public class ContractorController {
 	ResponseEntity<List<String>> getWeekRangeThatContainReports(@RequestParam(value = "by") String byEmail, @RequestParam(value = "for") String forEmail, @RequestParam(value = "year") Integer year, @RequestParam(value = "month") String month, @RequestHeader (name="Authorization") String token) throws ReportException, Exception{
 		token = token.split(" ")[1];
 		return new ResponseEntity<>(reportService.getWeeksContainingReports(byEmail, forEmail, token, year, month), HttpStatus.OK);
+	}
+
+	@PutMapping("/finalize-report")
+	ResponseEntity<ReportDTO> finalizeReport(
+			@RequestParam(value = "by") String byEmail,
+			@RequestParam(value = "for") String forEmail,
+			@RequestParam(value = "weekStart") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekStartDate,
+			@RequestParam(value = "weekEnd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate weekEndDate,
+			@RequestHeader(name = "Authorization") String token) throws ReportException, Exception {
+		token = token.split(" ")[1];
+		return new ResponseEntity<>(reportService.finalizeReport(byEmail, forEmail, token, weekStartDate, weekEndDate), HttpStatus.OK);
 	}
 }

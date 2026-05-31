@@ -1,0 +1,21 @@
+# Local dev overlay — adds the React client to the backend stack.
+# Usage: docker compose -f docker-compose.yaml -f docker-compose.fullstack.yml up --build
+services:
+  recon-client:
+    build:
+      context: ${RECON_CLIENT_CONTEXT}
+      dockerfile: Dockerfile.dev
+    env_file:
+      - env/recon-client.env
+    ports:
+      - ${RECON_CLIENT_HOST_PORT:-3000}:3000
+    volumes:
+      - ${RECON_CLIENT_CONTEXT}/src:/app/src
+      - ${RECON_CLIENT_CONTEXT}/public:/app/public
+    depends_on:
+      recon-core:
+        condition: service_healthy
+      recon-reports:
+        condition: service_healthy
+    stdin_open: true
+    tty: true

@@ -1,0 +1,91 @@
+#version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.35
+    env_file:
+      - ./env/mysql.env
+    volumes:
+      - recon-mysql-data:/var/lib/mysql
+      - ./reconV2/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./reconV2/src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      - ./docker/mysql/init/03-report-schema-extensions.sql:/docker-entrypoint-initdb.d/03-report-schema-extensions.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  eureka:
+    build: 
+      context: ./recon-discovery-service
+      dockerfile: Dockerfile
+    env_file:
+      - env/recon-eureka.env
+    ports:
+      - $RECON_EUREKA_HOST_PORT:$RECON_EUREKA_APP_PORT
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:$${APP_PORT}/actuator/health > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+  recon-core:
+    build:
+      context: ./reconV2
+      dockerfile: Dockerfile
+    env_file:
+      - env/recon-core.env
+    ports:
+      - $RECON_CORE_HOST_PORT:$RECON_CORE_APP_PORT
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:$${APP_PORT}/actuator/health > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
+  recon-reports:
+    build:
+      context: ./recon-report-service
+      dockerfile: Dockerfile
+    env_file:
+      - ./env/recon-report.env
+    ports:
+      - $RECON_REPORT_HOST_PORT:$RECON_REPORT_APP_PORT
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:$${APP_PORT}/actuator/health > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
+  recon-email:
+    build:
+      context: ./recon-email-service
+      dockerfile: Dockerfile
+    env_file:
+      - env/recon-email.env
+    ports:
+      - $RECON_EMAIL_HOST_PORT:$RECON_EMAIL_APP_PORT
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:$${APP_PORT}/actuator/health > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 120s
+
+volumes:
+  recon-mysql-data:

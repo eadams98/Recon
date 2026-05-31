@@ -31,22 +31,52 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 		       "FROM Report r " +
 		       "WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND week_start_date = :startOfWeek AND week_end_date = :endOfWeek")
 	Optional<Report>  getSpecificReport(Integer contractorId, Integer traineeId, LocalDate startOfWeek, LocalDate endOfWeek);
+
+	/** Same lookup as {@link #getSpecificReport} but only if the row is finalized (school / trainee reads). */
+	@Query("SELECT r " +
+			"FROM Report r " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND week_start_date = :startOfWeek "
+			+ "AND week_end_date = :endOfWeek AND is_finalized = true")
+	Optional<Report> getSchoolVisibleSpecificReport(Integer contractorId, Integer traineeId, LocalDate startOfWeek,
+			LocalDate endOfWeek);
+
 	
 	
 	@Query("SELECT YEAR(week_start_date) AS year FROM Report " +
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId " +
 			"GROUP BY YEAR(week_start_date)")
 	List<String> getYearsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId);
+
+	@Query("SELECT YEAR(week_start_date) AS year FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND is_finalized = true " +
+			"GROUP BY YEAR(week_start_date)")
+	List<String> getSchoolVisibleYearsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId);
 	
 	@Query("SELECT DATE_FORMAT(week_start_date, '%M') AS month FROM Report " +
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year " +
 			"GROUP BY month")
 	List<String> getMonthsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year);
+
+	@Query("SELECT DATE_FORMAT(week_start_date, '%M') AS month FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year "
+			+ "AND is_finalized = true "
+			+ "GROUP BY month")
+	List<String> getSchoolVisibleMonthsWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year);
 	
 	@Query("SELECT CONCAT(week_start_date, ' - ',  week_end_date) AS weekly_report FROM Report " +
 			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year AND MONTH(week_start_date) = :month"
 	)
 	List<String> getWeeksWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year, Integer month);
+
+	/**
+	 * Same as {@link #getWeeksWithReportsOfContractorWithTrainee} but only weeks the school / trainee
+	 * may see ({@code is_finalized = true}).
+	 */
+	@Query("SELECT CONCAT(week_start_date, ' - ',  week_end_date) AS weekly_report FROM Report " +
+			"WHERE contractor_link_id = :contractorId AND trainee_link_id = :traineeId AND YEAR(week_start_date) = :year AND MONTH(week_start_date) = :month "
+			+ "AND is_finalized = true"
+	)
+	List<String> getSchoolVisibleWeeksWithReportsOfContractorWithTrainee(Integer contractorId, Integer traineeId, Integer year, Integer month);
 	
 }
 
