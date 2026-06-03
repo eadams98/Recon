@@ -15,11 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import com.idea.recon.client.InterServiceHttpClient;
 import com.idea.recon.dto.ContractorAndTraineeCorrespondenceDTO;
 import com.idea.recon.dto.CreateRetortDTO;
 import com.idea.recon.dto.RelationshipVerificationDTO;
@@ -41,7 +40,7 @@ public class ReportServiceImpl implements ReportService {
 	private final org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	RestTemplate restTemplate;
+	InterServiceHttpClient interServiceHttpClient;
 	
 	@Autowired
 	MicroserviceUtil microserviceUtil;
@@ -345,7 +344,7 @@ public class ReportServiceImpl implements ReportService {
 				"http://user-service/verify/school/contractor-to-trainee?by=" + contractorEmail + "&for=" + traineeEmail;
 		ResponseEntity<RelationshipVerificationDTO> response = null;
 		try {
-			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			response = interServiceHttpClient.get(url, entity, RelationshipVerificationDTO.class);
 			logger.info("school verify: " + response.getBody());
 		} catch (Exception ex) {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
@@ -365,7 +364,7 @@ public class ReportServiceImpl implements ReportService {
 				"http://user-service/verify/trainee/contractor-to-trainee?by=" + contractorEmail + "&for=" + traineeEmail;
 		ResponseEntity<RelationshipVerificationDTO> response = null;
 		try {
-			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			response = interServiceHttpClient.get(url, entity, RelationshipVerificationDTO.class);
 			logger.info("trainee verify: " + response.getBody());
 		} catch (Exception ex) {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
@@ -426,7 +425,7 @@ public class ReportServiceImpl implements ReportService {
 		String url = "http://user-service/verify/contractor-to-trainee?by=" + sentByEmail + "&for=" + sentForEmail;
 		ResponseEntity<RelationshipVerificationDTO> response = null; 
 		try {
-			response = restTemplate.exchange(url, HttpMethod.GET, entity, RelationshipVerificationDTO.class);
+			response = interServiceHttpClient.get(url, entity, RelationshipVerificationDTO.class);
 			logger.info("AFTER RESPONE: " + response.getBody().toString());
 		} catch (Exception ex) {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
@@ -458,8 +457,7 @@ public class ReportServiceImpl implements ReportService {
 		HttpEntity<ContractorAndTraineeCorrespondenceDTO> entity = new HttpEntity<>(data, headers);
 
 		try {
-			response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-			//restTemplate.postFor
+			response = interServiceHttpClient.postWithoutRetry(url, entity, String.class);
 			logger.info("AFTER RESPONE: " + response.getBody().toString());
 		} catch (Exception ex) {
 			microserviceUtil.handleHttpClientExceptionAndHttpServerException(ex);
