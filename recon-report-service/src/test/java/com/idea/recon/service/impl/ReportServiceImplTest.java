@@ -22,10 +22,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
+import com.idea.recon.client.InterServiceHttpClient;
 import com.idea.recon.dto.CreateRetortDTO;
 import com.idea.recon.dto.RelationshipVerificationDTO;
 import com.idea.recon.dto.ReportDTO;
@@ -41,7 +40,7 @@ import com.idea.recon.utility.MicroserviceUtil;
 class ReportServiceImplTest {
 
 	@Mock
-	private RestTemplate restTemplate;
+	private InterServiceHttpClient interServiceHttpClient;
 
 	@Mock
 	private MicroserviceUtil microserviceUtil;
@@ -76,7 +75,7 @@ class ReportServiceImplTest {
 				.weekEndDate(LocalDate.of(2026, 5, 10))
 				.build();
 
-		when(restTemplate.exchange(contains("/verify/contractor-to-trainee"), eq(HttpMethod.GET), any(HttpEntity.class),
+		when(interServiceHttpClient.get(contains("/verify/contractor-to-trainee"), any(HttpEntity.class),
 				eq(RelationshipVerificationDTO.class))).thenReturn(ResponseEntity.ok(relationship));
 		when(reportRepository.contractorReportExist(eq(10), eq(20), eq(LocalDate.of(2026, 5, 4)),
 				eq(LocalDate.of(2026, 5, 10)))).thenReturn(false);
@@ -85,7 +84,7 @@ class ReportServiceImplTest {
 			report.setReportId(99);
 			return report;
 		});
-		when(restTemplate.exchange(contains("/email/report-created"), eq(HttpMethod.POST), any(HttpEntity.class),
+		when(interServiceHttpClient.postWithoutRetry(contains("/email/report-created"), any(HttpEntity.class),
 				eq(String.class))).thenReturn(ResponseEntity.ok("ok"));
 
 		String result = reportService.createReport(reportDTO, "token");
@@ -138,7 +137,7 @@ class ReportServiceImplTest {
 				.finalizedAt(null)
 				.build();
 
-		when(restTemplate.exchange(contains("/verify/contractor-to-trainee"), eq(HttpMethod.GET), any(HttpEntity.class),
+		when(interServiceHttpClient.get(contains("/verify/contractor-to-trainee"), any(HttpEntity.class),
 				eq(RelationshipVerificationDTO.class))).thenReturn(ResponseEntity.ok(relationship));
 		when(reportRepository.getSpecificReport(eq(10), eq(20), eq(weekStart), eq(weekEnd)))
 				.thenReturn(Optional.of(draft));
@@ -173,7 +172,7 @@ class ReportServiceImplTest {
 				.weekEndDate(weekEnd)
 				.build();
 
-		when(restTemplate.exchange(contains("/verify/trainee/contractor-to-trainee"), eq(HttpMethod.GET),
+		when(interServiceHttpClient.get(contains("/verify/trainee/contractor-to-trainee"),
 				any(HttpEntity.class), eq(RelationshipVerificationDTO.class)))
 				.thenReturn(ResponseEntity.ok(relationship));
 		when(reportRepository.getSpecificReport(eq(10), eq(20), eq(weekStart), eq(weekEnd)))
@@ -206,7 +205,7 @@ class ReportServiceImplTest {
 				.weekEndDate(weekEnd)
 				.build();
 
-		when(restTemplate.exchange(contains("/verify/trainee/contractor-to-trainee"), eq(HttpMethod.GET),
+		when(interServiceHttpClient.get(contains("/verify/trainee/contractor-to-trainee"),
 				any(HttpEntity.class), eq(RelationshipVerificationDTO.class)))
 				.thenReturn(ResponseEntity.ok(relationship));
 		when(reportRepository.getSpecificReport(eq(10), eq(20), eq(weekStart), eq(weekEnd)))
