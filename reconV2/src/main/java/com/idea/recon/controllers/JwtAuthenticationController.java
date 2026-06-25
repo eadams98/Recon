@@ -74,9 +74,37 @@ public class JwtAuthenticationController {
 	
 	@Autowired
 	private AmazonS3 s3Client;
+
+	int errorCount=0;
 	
 	@GetMapping(value="/test", produces="application/json")
 	public ResponseEntity<String> helloWorld() {
+		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+	}
+
+	@GetMapping(value="/test/internal-error", produces="application/json")
+	public ResponseEntity<String> helloInternalError() {
+		if (errorCount<10) {
+			++errorCount;
+			return new ResponseEntity<>("Hello World!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+	}
+
+	@GetMapping(value="/test/variable-response/{seconds}", produces="application/json")
+	public ResponseEntity<String> helloResponseTime(@PathVariable int seconds) throws InterruptedException {
+		seconds = Math.abs(seconds);
+		int sleepMs = seconds*1000;
+		Thread.sleep(sleepMs);
+		return new ResponseEntity<>("Hello World, I slept for "+seconds+" seconds", HttpStatus.OK);
+	}
+
+	@GetMapping(value="/test/flaky/{perecent}", produces="application/json")
+	public ResponseEntity<String> helloRandomSuccess(@PathVariable int perecent){
+		int rand = (int)(Math.random()*100);
+		logger.info("Flaky test: returning" + (rand > perecent ? " OK" : " Internal Server Error"));
+		if (rand < perecent)
+			return new ResponseEntity<>("Hello World!", HttpStatus.INTERNAL_SERVER_ERROR);
 		return new ResponseEntity<>("Hello World!", HttpStatus.OK);
 	}
 
