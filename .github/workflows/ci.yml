@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+run-name: Build and Verify
+
+on:
+  push:
+    branches: [ feature/*, dockerized ]
+  pull_request:
+    branches: [ dockerized ]
+
+jobs:
+  build:
+    name: Build and Verify Java services
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - recon-core
+          - recon-reports
+          - recon-email
+          - recon-gateway
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Run a one-line script
+        run: echo "Starting automated tests..."
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+          cache-dependency-path: ${{ matrix.service }}/pom.xml
+
+      - name: Build ${{ matrix.service }}
+        working-directory: ${{ matrix.service }}
+        run: mvn -B clean verify
+
