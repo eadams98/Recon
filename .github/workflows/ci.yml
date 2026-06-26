@@ -29,11 +29,11 @@ jobs:
       - name: Run a one-line script
         run: echo "Starting automated tests..."
 
-      - name: Set up Java 11
+      - name: Set up Java 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
           cache: maven
           cache-dependency-path: ${{ matrix.service }}/pom.xml
 
