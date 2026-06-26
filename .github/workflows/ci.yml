@@ -16,9 +16,10 @@ jobs:
     strategy:
       matrix:
         service:
-          - recon-core
-          - recon-reports
-          - recon-email
+          - recon-discovery-service
+          - reconV2
+          - recon-report-service
+          - recon-email-service
           - recon-gateway
 
     steps:
