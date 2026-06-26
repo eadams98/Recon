@@ -1,6 +1,6 @@
 name: CI Pipeline
 
-run-name: Build and Verify
+run-name: Continous Integration - Pull Image, Build Maven and Verify Java services
 
 on:
   push:
