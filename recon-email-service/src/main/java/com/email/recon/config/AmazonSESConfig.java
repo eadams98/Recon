@@ -6,6 +6,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.mail.simplemail.SimpleEmailServiceJavaMailSender;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 @Configuration
 public class AmazonSESConfig {
 
+	@Value("${AWS_EMAIL_ACCESS_KEY:Default-AWS-Key}")
+	String accessKey;
+
+	@Value("${AWS_EMAIL_ACCESS_SECRET:Default-AWS-Secret}")
+	String accessSecret;
+
 	@Bean
 	public AmazonSimpleEmailService amazonSimpleEmailService() {
-		String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
-		String accessSecret = System.getenv("AWS_SECRET_ACCESS_KEY");
 		if (accessKey == null || accessSecret == null) {
 			throw new IllegalStateException("Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for SES.");
 		}
