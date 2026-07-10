@@ -15,6 +15,7 @@
 	<description>Recon email service</description>
 	<properties>
 		<java.version>11</java.version>
+		<lombok.version>1.18.46</lombok.version>
 		<spring-cloud.version>2021.0.6</spring-cloud.version>
 	</properties>
 	<dependencies>
