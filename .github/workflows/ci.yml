@@ -1,10 +1,13 @@
 name: CI Pipeline
 
-run-name: Build and Verify
+run-name: Continous Integration - Pull Image, Build Maven and Verify Java services
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ feature/*, dockerized ]
+    # feature/* matches feature/feature-name (one slash)
+    # feature/** matches feature/feature-name/123 (multiple slashes)
+    branches: [ feature/**, dockerized ]
   pull_request:
     branches: [ dockerized ]
 
@@ -14,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      # Don't fail the entire build if one service fails'
+      fail-fast: false
       matrix:
         service:
           - recon-discovery-service
